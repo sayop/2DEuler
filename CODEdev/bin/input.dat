@@ -1,0 +1,4 @@
+#Input file for tecplot print
+2-D Euler solver
+imax            33
+jmax            21
