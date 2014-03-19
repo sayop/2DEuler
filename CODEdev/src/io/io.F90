@@ -51,7 +51,7 @@ CONTAINS
 !-----------------------------------------------------------------------------!
 !  Write Tecplot file
 !-----------------------------------------------------------------------------!
-     USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, xp
+     USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, ires, jres, xp
      USE GridJacobian_m, ONLY: JACOBIAN
      IMPLICIT NONE
      CHARACTER(LEN=filenameLength), INTENT(IN) :: fileName
@@ -64,7 +64,7 @@ CONTAINS
      WRITE(IOunit,'(a)') 'Variables=' // TRIM(varList)
 
      WRITE(IOunit,'(a)') ""
-     WRITE(IOunit,'(a,i6,a,i6,a)') 'Zone I=', imax, ', J=', jmax, ' F=POINT'
+     WRITE(IOunit,'(a,i6,a,i6,a)') 'Zone I=', ires, ', J=', jres, ', F=POINT'
 
      DO j = imin, jmax
         DO i = jmin, imax
