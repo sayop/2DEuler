@@ -2,3 +2,5 @@
 2-D Euler solver
 imax            33
 jmax            21
+ngl		3
+gridFile	grid.coarse

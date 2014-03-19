@@ -8,6 +8,7 @@ MODULE io_m
    IMPLICIT NONE
    INTEGER, PARAMETER :: IOunit = 10, filenameLength = 64
    CHARACTER(LEN=50) :: prjTitle
+   CHARACTER(LEN=filenameLength) :: gridFile
 CONTAINS
 
 !-----------------------------------------------------------------------------!
@@ -15,7 +16,7 @@ CONTAINS
 !-----------------------------------------------------------------------------!
 !  Read input files for transformation 1:
 !-----------------------------------------------------------------------------!
-     USE SimulationVars_m, ONLY: imax, jmax
+     USE SimulationVars_m, ONLY: imax, jmax, ngl
      IMPLICIT NONE
      INTEGER :: ios
      CHARACTER(LEN=8) :: inputVar
@@ -38,7 +39,39 @@ CONTAINS
      WRITE(*,'(a,i6)') inputVar,imax
      READ(IOunit,*) inputVar, jmax
      WRITE(*,'(a,i6)') inputVar,jmax
+     READ(IOunit,*) inputVar, ngl
+     WRITE(*,'(a,i6)') inputVar, ngl
+     READ(IOunit,*) inputVar, gridFile
+     WRITE(*,'(a,2x,a)') inputVar, gridFile
 
   END SUBROUTINE ReadInput
-   
+
+!-----------------------------------------------------------------------------!
+   SUBROUTINE WriteTecPlot(fileName,varList)
+!-----------------------------------------------------------------------------!
+!  Write Tecplot file
+!-----------------------------------------------------------------------------!
+     USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, xp
+     USE GridJacobian_m, ONLY: JACOBIAN
+     IMPLICIT NONE
+     CHARACTER(LEN=filenameLength), INTENT(IN) :: fileName
+     CHARACTER(LEN=*), INTENT(IN) :: varList
+     INTEGER :: i, j
+
+     OPEN(IOunit, File = fileName, FORM = 'FORMATTED', ACTION = 'WRITE')
+     ! writes the two line TECPLOT header
+     WRITE(IOunit,'(a)') 'Title="' // TRIM(prjTitle) // '"'
+     WRITE(IOunit,'(a)') 'Variables=' // TRIM(varList)
+
+     WRITE(IOunit,'(a)') ""
+     WRITE(IOunit,'(a,i6,a,i6,a)') 'Zone I=', imax, ', J=', jmax, ' F=POINT'
+
+     DO j = imin, jmax
+        DO i = jmin, imax
+           WRITE(IOunit,'(3g15.6)') xp(1,i,j), xp(2,i,j), JACOBIAN(I,J)
+        ENDDO
+     ENDDO
+     CLOSE(IOunit)
+
+   END SUBROUTINE WriteTecPlot   
 END MODULE io_m

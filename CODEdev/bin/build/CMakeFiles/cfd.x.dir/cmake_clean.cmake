@@ -1,5 +1,7 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/cfd.x.dir/main/main.F90.o"
+  "CMakeFiles/cfd.x.dir/main/GridJacobian.F90.o"
+  "CMakeFiles/cfd.x.dir/main/SimulationSetup.F90.o"
   "CMakeFiles/cfd.x.dir/main/SimulationVars.F90.o"
   "CMakeFiles/cfd.x.dir/main/Parameters.F90.o"
   "CMakeFiles/cfd.x.dir/io/ReadGrid.F90.o"

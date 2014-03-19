@@ -127,6 +127,14 @@ io/io.F90.o:
 	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/io/io.F90.o
 .PHONY : io/io.F90.o
 
+main/GridJacobian.o: main/GridJacobian.F90.o
+.PHONY : main/GridJacobian.o
+
+# target to build an object file
+main/GridJacobian.F90.o:
+	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/GridJacobian.F90.o
+.PHONY : main/GridJacobian.F90.o
+
 main/Parameters.o: main/Parameters.F90.o
 .PHONY : main/Parameters.o
 
@@ -134,6 +142,14 @@ main/Parameters.o: main/Parameters.F90.o
 main/Parameters.F90.o:
 	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/Parameters.F90.o
 .PHONY : main/Parameters.F90.o
+
+main/SimulationSetup.o: main/SimulationSetup.F90.o
+.PHONY : main/SimulationSetup.o
+
+# target to build an object file
+main/SimulationSetup.F90.o:
+	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/SimulationSetup.F90.o
+.PHONY : main/SimulationSetup.F90.o
 
 main/SimulationVars.o: main/SimulationVars.F90.o
 .PHONY : main/SimulationVars.o
@@ -162,7 +178,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... io/ReadGrid.o"
 	@echo "... io/io.o"
+	@echo "... main/GridJacobian.o"
 	@echo "... main/Parameters.o"
+	@echo "... main/SimulationSetup.o"
 	@echo "... main/SimulationVars.o"
 	@echo "... main/main.o"
 .PHONY : help

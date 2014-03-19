@@ -5,7 +5,7 @@ MODULE SimulationVars_m
    USE parameters_m, ONLY : wp
    IMPLICIT NONE
 
-   INTEGER :: IMAX, JMAX
-   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: xp
+   INTEGER :: IMAX, JMAX, NGL, IMIN, JMIN, INCELL, JNCELL
+   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: XP
 
 END MODULE SimulationVars_m

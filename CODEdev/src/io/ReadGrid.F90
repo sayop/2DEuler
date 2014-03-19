@@ -12,20 +12,38 @@ MODULE ReadGrid_m
 CONTAINS
 
 !-----------------------------------------------------------------------------!
-   SUBROUTINE INGRID()
+  SUBROUTINE INGRID()
 !-----------------------------------------------------------------------------!
-!  Read grid file
-!  X: X locations of grid points
-!  Y: Y locations of grid points
-!  IMAX: maximum number of points in the i-direction
-!  JMAX: maximum number of points in the j-direction
+! Read grid file
+! X: X locations of grid points
+! Y: Y locations of grid points
+! IMAX: maximum number of points in the i-direction
+! JMAX: maximum number of points in the j-direction
 !-----------------------------------------------------------------------------!
-     USE SimulationVars_m, ONLY: XP, IMAX, JMAX
+    USE SimulationVars_m, ONLY: XP, IMAX, JMAX, IMIN, JMIN
+    USE io_m, ONLY: IOunit, gridFile
 
-     IMPLICIT NONE
-     INTEGER :: I, J 
-     ALLOCATE(XP(3,IMAX,JMAX))
+    IMPLICIT NONE
+    INTEGER :: ios, I, J
 
-   END SUBROUTINE INGRID
+    OPEN(IOunit, FILE = gridFile, FORM = 'FORMATTED', ACTION = 'READ', &
+         STATUS = 'OLD', IOSTAT = ios)
+    IF(ios /= 0) THEN
+      WRITE(*,'(a)') ""
+      WRITE(*,'(a)') "Fatal error: Could not open the grid file."
+      RETURN
+    ELSE
+      WRITE(*,'(a)') ""
+      WRITE(*,'(a,1x,a)') "Reading grid file:", gridFile
+    ENDIF
+
+    DO I = IMIN, IMAX
+      DO J = JMIN, JMAX
+        READ(IOunit,'(1x,e11.4,5x,e11.4)') XP(1,I,J), XP(2,I,J)
+      END DO  ! J-LOOP
+      READ(IOunit,*)
+    END DO  ! I-LOOP
+
+  END SUBROUTINE INGRID
 
 END MODULE ReadGrid_m
