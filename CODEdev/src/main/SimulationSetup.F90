@@ -24,7 +24,26 @@ CONTAINS
     jmax = ngl + jmax
     ires = imax - imin + 1
     jres = jmax - jmin + 1
+
+    ! x, y, z
     ALLOCATE(XP(3,incell,jncell))
 
+    ALLOCATE(U(4,incell,jncell))
+    ALLOCATE(F(4,incell,jncell))
+    ALLOCATE(G(4,incell,jncell))
+    ALLOCATE(UP(4,incell,jncell))
+    ALLOCATE(FP(4,incell,jncell))
+    ALLOCATE(GP(4,incell,jncell))
+    ALLOCATE(V(4,incell,jncell))
+
   END SUBROUTINE InitializeGridArrays
+
+!-----------------------------------------------------------------------------!
+  SUBROUTINE SetInitialConditions()
+!-----------------------------------------------------------------------------!
+
+  USE SimulationVars_m, ONLY: imin, jmin, imax, jmax
+
+
+  END SUBROUTINE SetInitialConditions
 END MODULE SimulationSetup_m

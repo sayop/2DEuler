@@ -9,10 +9,12 @@ MODULE SimulationVars_m
               IRES, JRES
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: XP, VEL
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:) :: RHO, PRES
-   ! State vector: UU includes 'nelm' elements
-   ! Transformed state vector: UP
-   ! Transformed flux vectors: FP, GP
-   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: UU
+   ! State and flux vectors: include 4 elements for 2D Euler
+   ! Transformed state, flux vector: U, F, G
+   ! Transformed state, flux vectors: UP, FP, GP
+   ! Primative variable vector: V
+   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: U, F, G
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: UP, FP, GP
+   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: V
 
 END MODULE SimulationVars_m
