@@ -127,6 +127,14 @@ io/io.F90.o:
 	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/io/io.F90.o
 .PHONY : io/io.F90.o
 
+main/AUSMPWplus/AUSMPWplus.o: main/AUSMPWplus/AUSMPWplus.F90.o
+.PHONY : main/AUSMPWplus/AUSMPWplus.o
+
+# target to build an object file
+main/AUSMPWplus/AUSMPWplus.F90.o:
+	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/AUSMPWplus/AUSMPWplus.F90.o
+.PHONY : main/AUSMPWplus/AUSMPWplus.F90.o
+
 main/GridJacobian.o: main/GridJacobian.F90.o
 .PHONY : main/GridJacobian.o
 
@@ -134,6 +142,14 @@ main/GridJacobian.o: main/GridJacobian.F90.o
 main/GridJacobian.F90.o:
 	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/GridJacobian.F90.o
 .PHONY : main/GridJacobian.F90.o
+
+main/MainLoop.o: main/MainLoop.F90.o
+.PHONY : main/MainLoop.o
+
+# target to build an object file
+main/MainLoop.F90.o:
+	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/MainLoop.F90.o
+.PHONY : main/MainLoop.F90.o
 
 main/Parameters.o: main/Parameters.F90.o
 .PHONY : main/Parameters.o
@@ -159,6 +175,14 @@ main/SimulationVars.F90.o:
 	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/SimulationVars.F90.o
 .PHONY : main/SimulationVars.F90.o
 
+main/TimeIntegration.o: main/TimeIntegration.F90.o
+.PHONY : main/TimeIntegration.o
+
+# target to build an object file
+main/TimeIntegration.F90.o:
+	$(MAKE) -f CMakeFiles/cfd.x.dir/build.make CMakeFiles/cfd.x.dir/main/TimeIntegration.F90.o
+.PHONY : main/TimeIntegration.F90.o
+
 main/main.o: main/main.F90.o
 .PHONY : main/main.o
 
@@ -178,10 +202,13 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... io/ReadGrid.o"
 	@echo "... io/io.o"
+	@echo "... main/AUSMPWplus/AUSMPWplus.o"
 	@echo "... main/GridJacobian.o"
+	@echo "... main/MainLoop.o"
 	@echo "... main/Parameters.o"
 	@echo "... main/SimulationSetup.o"
 	@echo "... main/SimulationVars.o"
+	@echo "... main/TimeIntegration.o"
 	@echo "... main/main.o"
 .PHONY : help
 

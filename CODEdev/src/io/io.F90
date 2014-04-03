@@ -6,6 +6,9 @@ MODULE io_m
    USE Parameters_m, ONLY: wp
 
    IMPLICIT NONE
+
+   ! cgammainit: initial heat capacity ratio: Cp/Cv
+   REAL(KIND=wp) :: rhoinit, uinit, vinit, cgammainit, pinit
    INTEGER, PARAMETER :: IOunit = 10, filenameLength = 64
    CHARACTER(LEN=50) :: prjTitle
    CHARACTER(LEN=filenameLength) :: gridFile
@@ -16,7 +19,8 @@ CONTAINS
 !-----------------------------------------------------------------------------!
 !  Read input files for transformation 1:
 !-----------------------------------------------------------------------------!
-     USE SimulationVars_m, ONLY: imax, jmax, ngl
+     USE SimulationVars_m, ONLY: imax, jmax, ngl, nmax
+     USE TimeIntegration_m, ONLY: CFL
      IMPLICIT NONE
      INTEGER :: ios
      CHARACTER(LEN=8) :: inputVar
@@ -44,6 +48,25 @@ CONTAINS
      READ(IOunit,*) inputVar, gridFile
      WRITE(*,'(a,2x,a)') inputVar, gridFile
 
+     !Read initial conditions
+     READ(IOunit,*)
+     READ(IOunit,*) inputVar, rhoinit
+     WRITE(*,'(a,g15.6)') inputVar, rhoinit
+     READ(IOunit,*) inputVar, uinit
+     WRITE(*,'(a,g15.6)') inputVar, uinit
+     READ(IOunit,*) inputVar, vinit
+     WRITE(*,'(a,g15.6)') inputVar, vinit
+     READ(IOunit,*) inputVar, pinit
+     WRITE(*,'(a,g15.6)') inputVar, pinit
+     READ(IOunit,*) inputVar, cgammainit
+     WRITE(*,'(a,g15.6)') inputVar, cgammainit
+
+     !Read Simulation parameters
+     READ(IOunit,*)
+     READ(IOunit,*) inputVar, nmax
+     WRITE(*,'(a,i6)') inputVar, nmax
+     READ(IOunit,*) inputVar, CFL
+     WRITE(*,'(a,g15.6)') inputVar, CFL
   END SUBROUTINE ReadInput
 
 !-----------------------------------------------------------------------------!
@@ -51,7 +74,8 @@ CONTAINS
 !-----------------------------------------------------------------------------!
 !  Write Tecplot file
 !-----------------------------------------------------------------------------!
-     USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, ires, jres, xp
+     USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, ires, jres, xp, &
+                                 V
      USE GridJacobian_m, ONLY: JACOBIAN
      IMPLICIT NONE
      CHARACTER(LEN=filenameLength), INTENT(IN) :: fileName
@@ -68,7 +92,8 @@ CONTAINS
 
      DO j = imin, jmax
         DO i = jmin, imax
-           WRITE(IOunit,'(3g15.6)') xp(1,i,j), xp(2,i,j), JACOBIAN(I,J)
+           WRITE(IOunit,'(7g15.6)') xp(1,i,j), xp(2,i,j), JACOBIAN(I,J), &
+                                    V(1,i,j), V(2,i,j), V(3,i,j), V(4,i,j)
         ENDDO
      ENDDO
      CLOSE(IOunit)

@@ -4,3 +4,12 @@ imax            33
 jmax            21
 ngl		3
 gridFile	grid.coarse
+#Initial conditions
+density		4.0
+u		1.0
+v		0.0
+pressure	0.7142857
+gamma		1.4
+#Simulation parameters
+nmax		10
+CFL		0.8
