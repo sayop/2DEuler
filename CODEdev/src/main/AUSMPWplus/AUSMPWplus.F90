@@ -23,17 +23,25 @@ CONTAINS
     ! UR: Right-extrapolated state vector at (i+1/2,j) or (i,j+1/2)
     !REAL(KIND=wp), DIMENSION(4) :: UL, UR
 
-    ! Fhalf: Flux in i-direction at i+1/2
-    ! Ghalf: Flux in j-direction at j+1/2
-    REAL(KIND=wp), DIMENSION(4,incell,jncell) :: Fhalf, Ghalf
+    ! FPhalf: Transformed flux in i-direction at i+1/2
+    ! GPhalf: Transformed flux in j-direction at j+1/2
+    REAL(KIND=wp), DIMENSION(4,incell,jncell) :: FPhalf, GPhalf
+    DO i = imin, imax - 1
+      DO j = jmin, jmax - 1
+        DO n = 1, 4
+          
+        END DO
+      END DO
+    END DO
 
-!    DO i = imin + 1, imax - 1
-!      DO j = jmin + 1, jmax - 1
-!        DO n = 1, 4
-!          DF(n,i,j) = FPpHalf(n) - FPmHalf(n) + GPpHalf(n) - GPpHalf(n)
-!        END DO
-!      END DO
-!    END DO
+    DO i = imin + 1, imax - 1
+      DO j = jmin + 1, jmax - 1
+        DO n = 1, 4
+          DF(n,i,j) = FPhalf(n,i,j) - FPhalf(n,i-1,j) + &
+                      GPhalf(n,i,j) - GPhalf(n,i,j-1)
+        END DO
+      END DO
+    END DO
 
 !    UL = LeftExtrapolateU('i',2,3)
   END SUBROUTINE SetAUSMPWplus
