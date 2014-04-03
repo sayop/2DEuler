@@ -13,3 +13,5 @@ gamma		1.4
 #Simulation parameters
 nmax		10
 CFL		0.8
+#AUSMPW+ parameters
+alpha		0.0

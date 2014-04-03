@@ -11,5 +11,7 @@ v		0.0
 pressure	0.7142857
 gamma		1.4
 #Simulation parameters
-nmax		10
+nmax		40
 CFL		0.8
+#AUSMPW+ parameters
+alpha		0.0

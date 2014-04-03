@@ -21,6 +21,7 @@ CONTAINS
 !-----------------------------------------------------------------------------!
      USE SimulationVars_m, ONLY: imax, jmax, ngl, nmax
      USE TimeIntegration_m, ONLY: CFL
+     USE AUSMPWplus_m, ONLY: alpha
      IMPLICIT NONE
      INTEGER :: ios
      CHARACTER(LEN=8) :: inputVar
@@ -67,6 +68,11 @@ CONTAINS
      WRITE(*,'(a,i6)') inputVar, nmax
      READ(IOunit,*) inputVar, CFL
      WRITE(*,'(a,g15.6)') inputVar, CFL
+
+     !Read AUSMPW+ parameters
+     READ(IOunit,*)
+     READ(IOunit,*) inputVar, alpha
+     WRITE(*,'(a,g15.6)') inputVar, alpha
   END SUBROUTINE ReadInput
 
 !-----------------------------------------------------------------------------!

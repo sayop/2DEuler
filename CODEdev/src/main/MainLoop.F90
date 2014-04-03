@@ -13,13 +13,15 @@ CONTAINS
 !-----------------------------------------------------------------------------!
     USE TimeIntegration_m
     USE SimulationVars_m, ONLY: nadv, nmax
-    USE SimulationSetup_m, ONLY: SetBoundaryConditions, SetTransformedVariables
+    USE SimulationSetup_m, ONLY: SetBoundaryConditions, SetTransformedVariables, &
+                                 SetPrimativeVariables
 
+    CALL SetTransformedVariables()
     TimeLoop: DO nadv = 1, nmax
-      CALL SetTransformedVariables()
       CALL SetBoundaryConditions()
       CALL SetTimeStep()
       CALL TimeIntegration()
+      CALL SetPrimativeVariables()
       WRITE(*,*) 'NADV=',nadv,'T=',t, 'DT=',dt
     END DO TimeLoop
 

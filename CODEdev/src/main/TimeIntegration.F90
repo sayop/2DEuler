@@ -47,6 +47,7 @@ CONTAINS
     DO i = imin + 1, imax - 1
       DO j = jmin + 1, jmax - 1
         DO n = 1, 4
+          !write(*,*) 'DF',DF(n,i,j)
           U(n,i,j) = U(n,i,j) - DF(n,i,j) * dt * JACOBIAN(i,j)
         END DO
       END DO
