@@ -37,39 +37,44 @@ CONTAINS
     ALLOCATE(UCON(2,incell,jncell))
     ALLOCATE(H0(incell,jncell))
     ALLOCATE(DF(4,incell,jncell))
+    ALLOCATE(MACH(incell,jncell))
 
+    errSum = 0.0_wp
   END SUBROUTINE InitializeGridArrays
 
 !-----------------------------------------------------------------------------!
   SUBROUTINE SetInitialConditions()
 !-----------------------------------------------------------------------------!
 
-    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, V, U, cgamma
+    USE SimulationVars_m, ONLY: V, cgamma
     USE io_m, ONLY: rhoinit, uinit, vinit, pinit, cgammainit
 
     ! Set initial primative vector
-!    V(1,:,:) = rhoinit
-!    V(2,:,:) = uinit
-!    V(3,:,:) = vinit
-!    V(4,:,:) = pinit
+    V(1,:,:) = rhoinit
+    V(2,:,:) = uinit
+    V(3,:,:) = vinit
+    V(4,:,:) = pinit
     cgamma = cgammainit
     
     ! Set initial state vector elements
-    U(1,:,:) = rhoinit
-    U(2,:,:) = rhoinit * uinit
-    U(3,:,:) = rhoinit * vinit
-    U(4,:,:) = pinit / (cgammainit - 1.0_wp) + 0.5_wp * rhoinit * &
-               (uinit ** 2 + vinit ** 2)
+    !U(1,:,:) = rhoinit
+    !U(2,:,:) = rhoinit * uinit
+    !U(3,:,:) = rhoinit * vinit
+    !U(4,:,:) = pinit / (cgammainit - 1.0_wp) + 0.5_wp * rhoinit * &
+    !           (uinit ** 2 + vinit ** 2)
 
-    CALL SetPrimativeVariables()
+    CALL SetTransformedVariables()
   END SUBROUTINE SetInitialConditions
 
 !-----------------------------------------------------------------------------!
   SUBROUTINE SetPrimativeVariables()
 !-----------------------------------------------------------------------------!
 ! U -> V
-    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, V, U, cgamma, H0
+    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, V, U, cgamma, H0, &
+                                MACH
     INTEGER :: i, j
+    REAL(KIND=wp) :: aa !Speed of sound
+    REAL(KIND=wp) :: speed !Speed at each node
 
     DO i = imin, imax
       DO j = jmin, jmax
@@ -86,6 +91,9 @@ CONTAINS
         ! Stagnation enthalpy: H0
         H0(i,j) = (cgamma/(cgamma - 1.0_wp)) * V(4,i,j) / V(1,i,j) + &
                   0.5_wp * (V(2,i,j) ** 2 + V(3,i,j) ** 2)
+        aa = sqrt(cgamma * V(4,i,j) / V(1,i,j))
+        speed = sqrt(V(2,i,j) ** 2 + V(3,i,j) ** 2)
+        MACH(i,j) = speed / aa
       END DO
     END DO
   END SUBROUTINE SetPrimativeVariables
@@ -100,8 +108,8 @@ CONTAINS
 
     DO i = imin, imax
       DO j = jmin, jmax
-        U(1,i,j) = V(1,j,j)
-        U(2,i,j) = V(1,i,j) * V(2,j,j)
+        U(1,i,j) = V(1,i,j)
+        U(2,i,j) = V(1,i,j) * V(2,i,j)
         U(3,i,j) = V(1,i,j) * V(3,i,j)
         U(4,i,j) = V(4,i,j) / (cgamma - 1.0_wp) + 0.5_wp * V(1,i,j) *&
                    (V(2,i,j) ** 2 + V(3,i,j) ** 2)
@@ -126,7 +134,7 @@ CONTAINS
 
     ! Set inflow boundary condition
     i = imin
-    DO j = jmin, jmax
+    DO j = jmin + 1, jmax - 1
       V(1,i,j) = rhoinit
       V(2,i,j) = uinit
       V(3,i,j) = vinit
@@ -135,7 +143,7 @@ CONTAINS
 
     ! Set outflow boundary condition
     i = imax
-    DO j = jmin, jmax
+    DO j = jmin + 1, jmax - 1
       V(1,i,j) = V(1,i-1,j)
       V(2,i,j) = V(2,i-1,j)
       V(3,i,j) = V(3,i-1,j)
@@ -175,8 +183,9 @@ CONTAINS
       V(4,i,j) = V(4,i,j-1)
       V(1,i,j) = V(4,i,j) * cgamma / ( &
                  (cgamma - 1.0_wp) * (H0(i,j-1) - 0.5_wp * ( & 
-                 V(2,i,j) ** 2 + V(3,i,j) ** 3)) )
+                 V(2,i,j) ** 2 + V(3,i,j) ** 2)) )
     END DO
+    ! To set transformed flux vector and contravariant velocity
     CALL SetTransformedVariables()
   END SUBROUTINE SetBoundaryConditions
 END MODULE SimulationSetup_m

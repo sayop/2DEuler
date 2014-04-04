@@ -5,7 +5,8 @@ PROGRAM main
    USE Parameters_m, ONLY: wp
    USE ReadGrid_m, ONLY: INGRID
    USE MainLoop_m
-   USE SimulationSetup_m, ONLY: InitializeGridArrays, SetInitialConditions
+   USE SimulationSetup_m, ONLY: InitializeGridArrays, SetInitialConditions, &
+                                SetTransformedVariables
    USE GridJacobian_m, ONLY: InverseGridMetricsArrays, GridMetricsArrays
    USE io_m
 
@@ -19,6 +20,6 @@ PROGRAM main
    CALL GridMetricsArrays()
    CALL SetInitialConditions()
    CALL MainLoop()
-   CALL WriteTecPlot(outputfile,'"I","J","JACOBIAN","rho","u","v","p"')
+   CALL WriteTecPlot(outputfile,'"I","J","JACOBIAN","rho","u","v","p","MACH"')
 
 END PROGRAM main

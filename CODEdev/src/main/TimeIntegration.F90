@@ -47,10 +47,36 @@ CONTAINS
     DO i = imin + 1, imax - 1
       DO j = jmin + 1, jmax - 1
         DO n = 1, 4
-          !write(*,*) 'DF',DF(n,i,j)
           U(n,i,j) = U(n,i,j) - DF(n,i,j) * dt * JACOBIAN(i,j)
         END DO
+       ! write(*,*) 'sayop_',DF(1,i,j),DF(2,i,j),DF(3,i,j)
       END DO
     END DO
   END SUBROUTINE TimeIntegration
+
+!-----------------------------------------------------------------------------!
+  FUNCTION CheckConvergence() RESULT(ifinish)
+!-----------------------------------------------------------------------------!
+    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, U, nadv, RMSerr, &
+                                errLimit, errSum
+
+    INTEGER :: i, j, n, ifinish, nTotal
+    REAL(KIND=wp) :: error
+  
+    ifinish = 0
+    error = 0.0_wp
+    nTotal = 0
+    DO i = imin, imax
+      DO j = jmin, jmax
+        DO n = 1, 4
+          nTotal = nTotal + 1
+          error = error + U(n,i,j)
+        END DO
+      END DO
+    END DO
+
+    RMSerr = sqrt((error - errSum) ** 2 / nTotal)
+    IF(RMSerr .LT. errLimit) ifinish = 1
+    errSum = error
+  END FUNCTION CheckConvergence
 END MODULE TimeIntegration_m

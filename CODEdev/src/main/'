@@ -19,12 +19,12 @@ CONTAINS
 !-----------------------------------------------------------------------------!
 !  Read input files for transformation 1:
 !-----------------------------------------------------------------------------!
-     USE SimulationVars_m, ONLY: imax, jmax, ngl, nmax, errLimit
+     USE SimulationVars_m, ONLY: imax, jmax, ngl, nmax
      USE TimeIntegration_m, ONLY: CFL
      USE AUSMPWplus_m, ONLY: alpha, limiter
      IMPLICIT NONE
      INTEGER :: ios
-     CHARACTER(LEN=10) :: inputVar
+     CHARACTER(LEN=8) :: inputVar
 
      OPEN(IOunit, FILE = 'input.dat', FORM = 'FORMATTED', ACTION = 'READ', &
            STATUS = 'OLD', IOSTAT = ios)
@@ -68,8 +68,6 @@ CONTAINS
      WRITE(*,'(a,i6)') inputVar, nmax
      READ(IOunit,*) inputVar, CFL
      WRITE(*,'(a,g15.6)') inputVar, CFL
-     READ(IOunit,*) inputVar, errLimit
-     WRITE(*,'(a,g15.6)') inputVar, errLimit
 
      !Read AUSMPW+ parameters
      READ(IOunit,*)
@@ -85,7 +83,7 @@ CONTAINS
 !  Write Tecplot file
 !-----------------------------------------------------------------------------!
      USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, ires, jres, xp, &
-                                 V, MACH
+                                 V
      USE GridJacobian_m, ONLY: JACOBIAN
      IMPLICIT NONE
      CHARACTER(LEN=filenameLength), INTENT(IN) :: fileName
@@ -102,9 +100,8 @@ CONTAINS
 
      DO j = jmin, jmax
         DO i = imin, imax
-           WRITE(IOunit,'(8g15.6)') xp(1,i,j), xp(2,i,j), JACOBIAN(I,J), &
-                                    V(1,i,j), V(2,i,j), V(3,i,j), V(4,i,j), &
-                                    MACH(i,j)
+           WRITE(IOunit,'(7g15.6)') xp(1,i,j), xp(2,i,j), JACOBIAN(I,J), &
+                                    V(1,i,j), V(2,i,j), V(3,i,j), V(4,i,j)
         ENDDO
      ENDDO
      CLOSE(IOunit)

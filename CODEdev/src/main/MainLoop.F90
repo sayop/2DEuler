@@ -12,17 +12,24 @@ CONTAINS
   SUBROUTINE MainLoop()
 !-----------------------------------------------------------------------------!
     USE TimeIntegration_m
-    USE SimulationVars_m, ONLY: nadv, nmax
+    USE SimulationVars_m, ONLY: nadv, nmax, imin, imax, jmin, jmax, V, U, RMSerr
     USE SimulationSetup_m, ONLY: SetBoundaryConditions, SetTransformedVariables, &
                                  SetPrimativeVariables
 
-    CALL SetTransformedVariables()
+    INTEGER :: i,j
     TimeLoop: DO nadv = 1, nmax
       CALL SetBoundaryConditions()
       CALL SetTimeStep()
       CALL TimeIntegration()
       CALL SetPrimativeVariables()
-      WRITE(*,*) 'NADV=',nadv,'T=',t, 'DT=',dt
+      ! Update Contravariant velocities that need to be updated
+      ! in SetBoundaryConditions
+      !CALL SetTransformedVariables()
+      WRITE(*,*) 'NADV=',nadv,'T=',t, 'DT=',dt, 'RMSerr=',RMSerr
+      IF(CheckConvergence() .EQ. 1) THEN
+        WRITE(*,*) 'NORMAL TERMINATION AT NADV=',nadv,'and RMSerr=',RMSerr
+        return
+      END IF
     END DO TimeLoop
 
   END SUBROUTINE MainLoop

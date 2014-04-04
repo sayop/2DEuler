@@ -10,6 +10,8 @@ MODULE SimulationVars_m
               IRES, JRES
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: XP, VEL
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:) :: RHO, PRES
+   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:) :: MACH
+   REAL(KIND=wp) :: RMSerr, errLimit, errSum
    ! State and flux vectors: include 4 elements for 2D Euler
    ! Transformed state, flux vector: U, F, G
    ! Transformed state, flux vectors: UP, FP, GP

@@ -86,8 +86,7 @@ CONTAINS
         !utildL = UCL(1) / A1
         !vtildL = UCL(2) / A1
         utildL = (XIX * uu + XIY * vv) / A1
-        !vtildL = (ETAX * uu + ETAY * vv) / A1
-        vtildL = XIY * vv / A1
+        vtildL = (ETAX * uu + ETAY * vv) / A1
         !utildL = XIX * uu / A1
         !vtildL = ETAY * vv / A1
         ! Then calculate right-extrapolated state vector from i+1 point
@@ -103,8 +102,7 @@ CONTAINS
         !utildR = UCR(1) / A1
         !vtildR = UCR(2) / A1
         utildR = (XIX * uu + XIY * vv) / A1
-        !vtildR = (ETAX * uu + ETAY * vv) / A1
-        vtildR = XIY * vv / A1
+        vtildR = (ETAX * uu + ETAY * vv) / A1
         !utildR = XIX * uu / A1
         !vtildR = ETAY * vv / A1
         ! Calculate stagnation enthalpy normal to the interface
@@ -202,8 +200,7 @@ CONTAINS
         !UCL = LeftExtrapolateUC('j',i,j)
         !utildL = UCL(1) / A1
         !vtildL = UCL(2) / A1
-        !utildL = (XIX * uu + XIY * vv) / A1
-        utildL = ETAX * uu / A1
+        utildL = (XIX * uu + XIY * vv) / A1
         vtildL = (ETAX * uu + ETAY * vv) / A1
         !utildL = XIX * uu / A1
         !vtildL = ETAY * vv / A1
@@ -219,13 +216,12 @@ CONTAINS
         !UCR = RightExtrapolateUC('j',i,j)
         !utildR = UCR(1) / A1
         !vtildR = UCR(2) / A1
-        !utildR = (XIX * uu + XIY * vv) / A1
-        utildR = ETAX * uu / A1
+        utildR = (XIX * uu + XIY * vv) / A1
         vtildR = (ETAX * uu + ETAY * vv) / A1
         !utildR = XIX * uu / A1
         !vtildR = ETAY * vv / A1
         ! Calculate stagnation enthalpy normal to the interface
-        h0norm = 0.5_wp * (h0L + h0R - 0.5_wp * (utildL ** 2 + utildR ** 2))
+        h0norm = 0.5_wp * (h0L + h0R - 0.5_wp * (vtildL ** 2 + vtildR ** 2))
         ! Calculate cell averaged speed of sound
         ! Use Cavg for calculating Cs and then update to Cavg
         ! Use rr temporarily to store half of sum of vtildL and vtildR
