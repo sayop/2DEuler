@@ -21,7 +21,7 @@ CONTAINS
 !-----------------------------------------------------------------------------!
      USE SimulationVars_m, ONLY: imax, jmax, ngl, nmax, errLimit
      USE TimeIntegration_m, ONLY: CFL
-     USE AUSMPWplus_m, ONLY: alpha, limiter
+     USE AUSMPWplus_m, ONLY: alpha, epsil, kappa, limiter
      IMPLICIT NONE
      INTEGER :: ios
      CHARACTER(LEN=10) :: inputVar
@@ -75,8 +75,12 @@ CONTAINS
      READ(IOunit,*)
      READ(IOunit,*) inputVar, alpha
      WRITE(*,'(a,g15.6)') inputVar, alpha
+     READ(IOunit,*) inputVar, epsil
+     WRITE(*,'(a,i6)') inputVar, epsil
      READ(IOunit,*) inputVar, limiter
-     WRITE(*,'(a,g15.6)') inputVar, limiter
+     WRITE(*,'(a,i6)') inputVar, limiter
+     READ(IOunit,*) inputVar, kappa
+     WRITE(*,'(a,g15.6)') inputVar, kappa
   END SUBROUTINE ReadInput
 
 !-----------------------------------------------------------------------------!
@@ -86,7 +90,7 @@ CONTAINS
 !-----------------------------------------------------------------------------!
      USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, ires, jres, xp, &
                                  V, MACH
-     USE GridJacobian_m, ONLY: JACOBIAN
+     USE GridJacobian_m!, ONLY: JACOBIAN
      IMPLICIT NONE
      CHARACTER(LEN=filenameLength), INTENT(IN) :: fileName
      CHARACTER(LEN=*), INTENT(IN) :: varList
@@ -110,4 +114,45 @@ CONTAINS
      CLOSE(IOunit)
 
    END SUBROUTINE WriteTecPlot   
+
+!-----------------------------------------------------------------------------!
+  SUBROUTINE WriteErrorLog(iter)
+!-----------------------------------------------------------------------------!
+!  Write Error Log file
+!-----------------------------------------------------------------------------!
+  USE SimulationVars_m, ONLY: RMSerr
+  IMPLICIT NONE
+  INTEGER :: iter
+  CHARACTER(LEN=filenameLength) :: fileName = 'ErrorLog.dat'
+
+  IF(iter .EQ. 1) THEN
+    OPEN(IOunit, File = fileName, FORM = 'FORMATTED', ACTION = 'WRITE')
+    WRITE(IOunit,'(A,2A10)') '#','Iteration','RMS error'
+  ELSE
+    OPEN(IOunit, File = fileName, FORM = 'FORMATTED', ACTION = 'WRITE', &
+         POSITION = 'APPEND')
+  END IF
+
+    WRITE(IOunit,'(i6,g15.6)') iter, RMSerr
+    CLOSE(IOunit)
+  END SUBROUTINE WriteErrorLog
+
+!-----------------------------------------------------------------------------!
+  SUBROUTINE WriteDataOut()
+!-----------------------------------------------------------------------------!
+!  Write primative data out
+!-----------------------------------------------------------------------------!
+  USE SimulationVars_m, ONLY: V, imin, imax, jmin, jmax, xp, MACH
+
+  CHARACTER(LEN=filenameLength) :: fileName = 'WallData.dat'
+  INTEGER :: i, j
+
+  OPEN(IOunit, File = fileName, FORM = 'FORMATTED', ACTION = 'WRITE')
+  WRITE(IOunit,'(A,6A15)') '#','x','Density','u','v','p','Mach'
+  j = jmin
+  DO i = imin, imax
+    WRITE(IOunit,'(6g15.6)') XP(1,i,j), V(1,i,j), V(2,i,j), V(3,i,j), V(4,i,j), &
+                             MACH(i,j)
+  END DO
+  END SUBROUTINE WriteDataOut
 END MODULE io_m

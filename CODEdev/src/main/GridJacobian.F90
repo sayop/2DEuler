@@ -38,46 +38,97 @@ CONTAINS
 
     DO I = IMIN, IMAX
       DO J = JMIN, JMAX
-        IF(I .EQ. IMIN) THEN
-          ! Forward difference in i-direction
-          PXPI(I,J) = 0.5_wp * (-3.0_wp*XP(1,I,J) + 4.0_wp*XP(1,I+1,J) &
-                                - XP(1,I+2,J))
-          PYPI(I,J) = 0.5_wp * (-3.0_wp*XP(2,I,J) + 4.0_wp*XP(2,I+1,J) &
-                                - XP(2,I+2,J))
-        ELSEIF(I .EQ. IMAX) THEN
-          ! Backward difference in i-direction
-          PXPI(I,J) = 0.5_wp * (3.0_wp*XP(1,I,J) - 4.0_wp*XP(1,I-1,J) &
-                                + XP(1,I-2,J))
-          PYPI(I,J) = 0.5_wp * (3.0_wp*XP(2,I,J) - 4.0_wp*XP(2,I-1,J) &
-                                + XP(2,I-2,J))
-        ELSE
-          ! Central difference in i-direction
-          PXPI(I,J) = 0.5_wp * (XP(1,I+1,J) - XP(1,I-1,J))
-          PYPI(I,J) = 0.5_wp * (XP(2,I+1,J) - XP(2,I-1,J))
-        ENDIF
-
         IF(J .EQ. JMIN) THEN
-          ! Forward difference in j-direction
+          !Forward difference (2nd order)
           PXPJ(I,J) = 0.5_wp * (-3.0_wp*XP(1,I,J) + 4.0_wp*XP(1,I,J+1) &
                                 - XP(1,I,J+2))
           PYPJ(I,J) = 0.5_wp * (-3.0_wp*XP(2,I,J) + 4.0_wp*XP(2,I,J+1) &
                                 - XP(2,I,J+2))
-        ELSEIF(J .EQ. JMAX) THEN
-          ! Backward difference in j-direction
+        ELSE IF(J .EQ. JMAX) THEN
+          !Backward difference (2nd order)
           PXPJ(I,J) = 0.5_wp * (3.0_wp*XP(1,I,J) - 4.0_wp*XP(1,I,J-1) &
                                 + XP(1,I,J-2))
           PYPJ(I,J) = 0.5_wp * (3.0_wp*XP(2,I,J) - 4.0_wp*XP(2,I,J-1) &
                                 + XP(2,I,J-2))
         ELSE
-          ! Central difference in j-direction
+          !Central difference (2nd order)
           PXPJ(I,J) = 0.5_wp * (XP(1,I,J+1) - XP(1,I,J-1))
           PYPJ(I,J) = 0.5_wp * (XP(2,I,J+1) - XP(2,I,J-1))
-        ENDIF
+        END IF
+      END DO
+    END DO
+
+    DO J = JMIN, JMAX
+      DO I = IMIN, IMAX
+        IF(I .EQ. IMIN) THEN
+          !Forward difference (2nd order)
+          PXPI(I,J) = 0.5_wp * (-3.0_wp*XP(1,I,J) + 4.0_wp*XP(1,I+1,J) &
+                                - XP(1,I+2,J))
+          PYPI(I,J) = 0.5_wp * (-3.0_wp*XP(2,I,J) + 4.0_wp*XP(2,I+1,J) &
+                                - XP(2,I+2,J))
+        ELSE IF(I .EQ. IMAX) THEN
+          !Backward difference (2nd order)
+          PXPI(I,J) = 0.5_wp * (3.0_wp*XP(1,I,J) - 4.0_wp*XP(1,I-1,J) &
+                                + XP(1,I-2,J))
+          PYPI(I,J) = 0.5_wp * (3.0_wp*XP(2,I,J) - 4.0_wp*XP(2,I-1,J) &
+                                + XP(2,I-2,J))
+        ELSE
+          !Central difference (2nd order)
+          PXPI(I,J) = 0.5_wp * (XP(1,I+1,J) - XP(1,I-1,J))
+          PYPI(I,J) = 0.5_wp * (XP(2,I+1,J) - XP(2,I-1,J))
+        END IF
+      END DO
+    END DO
+
+    DO I = IMIN, IMAX
+      DO J = JMIN, JMAX
         ! Calculate Grid Jacobian: J
         JACOBIAN(I,J) = 1.0_wp / (PXPI(I,J) * PYPJ(I,J) - &
                                   PXPJ(I,J) * PYPI(I,J))
       END DO
     END DO
+!    DO I = IMIN, IMAX
+!      DO J = JMIN, JMAX
+!        IF(I .EQ. IMIN) THEN
+!          ! Forward difference in i-direction
+!          PXPI(I,J) = 0.5_wp * (-3.0_wp*XP(1,I,J) + 4.0_wp*XP(1,I+1,J) &
+!                                - XP(1,I+2,J))
+!          PYPI(I,J) = 0.5_wp * (-3.0_wp*XP(2,I,J) + 4.0_wp*XP(2,I+1,J) &
+!                                - XP(2,I+2,J))
+!        ELSEIF(I .EQ. IMAX) THEN
+!          ! Backward difference in i-direction
+!          PXPI(I,J) = 0.5_wp * (3.0_wp*XP(1,I,J) - 4.0_wp*XP(1,I-1,J) &
+!                                + XP(1,I-2,J))
+!          PYPI(I,J) = 0.5_wp * (3.0_wp*XP(2,I,J) - 4.0_wp*XP(2,I-1,J) &
+!                                + XP(2,I-2,J))
+!        ELSE
+!          ! Central difference in i-direction
+!          PXPI(I,J) = 0.5_wp * (XP(1,I+1,J) - XP(1,I-1,J))
+!          PYPI(I,J) = 0.5_wp * (XP(2,I+1,J) - XP(2,I-1,J))
+!        ENDIF
+!
+!        IF(J .EQ. JMIN) THEN
+!          ! Forward difference in j-direction
+!          PXPJ(I,J) = 0.5_wp * (-3.0_wp*XP(1,I,J) + 4.0_wp*XP(1,I,J+1) &
+!                                - XP(1,I,J+2))
+!          PYPJ(I,J) = 0.5_wp * (-3.0_wp*XP(2,I,J) + 4.0_wp*XP(2,I,J+1) &
+!                                - XP(2,I,J+2))
+!        ELSEIF(J .EQ. JMAX) THEN
+!          ! Backward difference in j-direction
+!          PXPJ(I,J) = 0.5_wp * (3.0_wp*XP(1,I,J) - 4.0_wp*XP(1,I,J-1) &
+!                                + XP(1,I,J-2))
+!          PYPJ(I,J) = 0.5_wp * (3.0_wp*XP(2,I,J) - 4.0_wp*XP(2,I,J-1) &
+!                                + XP(2,I,J-2))
+!        ELSE
+!          ! Central difference in j-direction
+!          PXPJ(I,J) = 0.5_wp * (XP(1,I,J+1) - XP(1,I,J-1))
+!          PYPJ(I,J) = 0.5_wp * (XP(2,I,J+1) - XP(2,I,J-1))
+!        ENDIF
+!        ! Calculate Grid Jacobian: J
+!        JACOBIAN(I,J) = 1.0_wp / (PXPI(I,J) * PYPJ(I,J) - &
+!                                  PXPJ(I,J) * PYPI(I,J))
+!      END DO
+!    END DO
   END SUBROUTINE InverseGridMetricsArrays
 
 !-----------------------------------------------------------------------------!

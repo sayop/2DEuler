@@ -36,7 +36,7 @@ CONTAINS
 !-----------------------------------------------------------------------------!
   SUBROUTINE TimeIntegration()
 !-----------------------------------------------------------------------------!
-    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, U, DF
+    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, U, UO, DF
     USE GridJacobian_m, ONLY: JACOBIAN
     USE AUSMPWplus_m, ONLY: SetAUSMPWplus
 
@@ -49,18 +49,17 @@ CONTAINS
         DO n = 1, 4
           U(n,i,j) = U(n,i,j) - DF(n,i,j) * dt * JACOBIAN(i,j)
         END DO
-       ! write(*,*) 'sayop_',DF(1,i,j),DF(2,i,j),DF(3,i,j)
       END DO
     END DO
   END SUBROUTINE TimeIntegration
 
 !-----------------------------------------------------------------------------!
-  FUNCTION CheckConvergence() RESULT(ifinish)
+  SUBROUTINE CheckConvergence()
 !-----------------------------------------------------------------------------!
-    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, U, nadv, RMSerr, &
-                                errLimit, errSum
+    USE SimulationVars_m, ONLY: imin, jmin, imax, jmax, U, UO, nadv, RMSerr, &
+                                errLimit, nadv, RMS1err, ifinish
 
-    INTEGER :: i, j, n, ifinish, nTotal
+    INTEGER :: i, j, n, nTotal
     REAL(KIND=wp) :: error
   
     ifinish = 0
@@ -70,13 +69,16 @@ CONTAINS
       DO j = jmin, jmax
         DO n = 1, 4
           nTotal = nTotal + 1
-          error = error + U(n,i,j)
+          error = error + (U(n,i,j) - UO(n,i,j)) ** 2
         END DO
       END DO
     END DO
+    RMSerr = sqrt(error / nTotal)
 
-    RMSerr = sqrt((error - errSum) ** 2 / nTotal)
+    IF(nadv .EQ. 1) RMS1err = RMSerr + 1.0E-9
+    RMSerr = RMSerr / RMS1err
     IF(RMSerr .LT. errLimit) ifinish = 1
-    errSum = error
-  END FUNCTION CheckConvergence
+
+    UO = U
+  END SUBROUTINE CheckConvergence
 END MODULE TimeIntegration_m

@@ -7,17 +7,17 @@ MODULE SimulationVars_m
 
    INTEGER :: NADV
    INTEGER :: IMAX, JMAX, NGL, IMIN, JMIN, INCELL, JNCELL, &
-              IRES, JRES
+              IRES, JRES, IFINISH
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: XP, VEL
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:) :: RHO, PRES
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:) :: MACH
-   REAL(KIND=wp) :: RMSerr, errLimit, errSum
+   REAL(KIND=wp) :: RMSerr, errLimit, RMS1err
    ! State and flux vectors: include 4 elements for 2D Euler
    ! Transformed state, flux vector: U, F, G
    ! Transformed state, flux vectors: UP, FP, GP
    ! Primative variable vector: V
    ! Total Stagnation enthalpy: H0
-   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: U, F, G
+   REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: U, UO, F, G
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: UP, FP, GP
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:,:) :: V
    REAL(KIND=wp), ALLOCATABLE, DIMENSION(:,:) :: H0

@@ -28,6 +28,7 @@ CONTAINS
     ALLOCATE(XP(3,incell,jncell))
 
     ALLOCATE(U(4,incell,jncell))
+    ALLOCATE(UO(4,incell,jncell))
     ALLOCATE(F(4,incell,jncell))
     ALLOCATE(G(4,incell,jncell))
     ALLOCATE(UP(4,incell,jncell))
@@ -39,14 +40,13 @@ CONTAINS
     ALLOCATE(DF(4,incell,jncell))
     ALLOCATE(MACH(incell,jncell))
 
-    errSum = 0.0_wp
   END SUBROUTINE InitializeGridArrays
 
 !-----------------------------------------------------------------------------!
   SUBROUTINE SetInitialConditions()
 !-----------------------------------------------------------------------------!
 
-    USE SimulationVars_m, ONLY: V, cgamma
+    USE SimulationVars_m, ONLY: V, cgamma, ifinish, U, UO
     USE io_m, ONLY: rhoinit, uinit, vinit, pinit, cgammainit
 
     ! Set initial primative vector
@@ -54,6 +54,7 @@ CONTAINS
     V(2,:,:) = uinit
     V(3,:,:) = vinit
     V(4,:,:) = pinit
+    !V(4,:,:) = 1.0_wp / cgammainit
     cgamma = cgammainit
     
     ! Set initial state vector elements
@@ -62,8 +63,16 @@ CONTAINS
     !U(3,:,:) = rhoinit * vinit
     !U(4,:,:) = pinit / (cgammainit - 1.0_wp) + 0.5_wp * rhoinit * &
     !           (uinit ** 2 + vinit ** 2)
-
+    ! To calculate initial H0 vector and MACH values
     CALL SetTransformedVariables()
+    ! To calculate initial H0 vector and MACH values
+    CALL SetPrimativeVariables()
+
+    !Set ifinish variable
+    ifinish = 0
+
+    ! Set UO
+    UO = U
   END SUBROUTINE SetInitialConditions
 
 !-----------------------------------------------------------------------------!
@@ -134,7 +143,7 @@ CONTAINS
 
     ! Set inflow boundary condition
     i = imin
-    DO j = jmin + 1, jmax - 1
+    DO j = jmin, jmax
       V(1,i,j) = rhoinit
       V(2,i,j) = uinit
       V(3,i,j) = vinit
@@ -143,7 +152,7 @@ CONTAINS
 
     ! Set outflow boundary condition
     i = imax
-    DO j = jmin + 1, jmax - 1
+    DO j = jmin, jmax
       V(1,i,j) = V(1,i-1,j)
       V(2,i,j) = V(2,i-1,j)
       V(3,i,j) = V(3,i-1,j)
@@ -152,7 +161,7 @@ CONTAINS
 
     ! Set bottom wall boundary condition
     j = jmin
-    DO i = imin, imax
+    DO i = imin + 1, imax - 1
       !Set u, v velocities, density and pressure
       del2 = sqrt( PIPX(i,j) ** 2 + PIPY(i,j) ** 2 ) / &
              sqrt( PIPX(i,j+1) ** 2 + PIPY(i,j+1) ** 2)
@@ -170,7 +179,7 @@ CONTAINS
 
     ! Set top wall boundary condition
     j = jmax
-    DO i = imin, imax
+    DO i = imin + 1, imax - 1
       !Set u, v velocities, density and pressure
       del2 = sqrt( PIPX(i,j) ** 2 + PIPY(i,j) ** 2 ) / &
              sqrt( PIPX(i,j-1) ** 2 + PIPY(i,j-1) ** 2)

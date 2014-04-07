@@ -12,7 +12,9 @@ PROGRAM main
 
    IMPLICIT NONE
    CHARACTER(LEN=filenameLength) :: outputfile = 'output.tec'
+   REAL(KIND=wp) :: START, FINISH
 
+   CALL CPU_TIME(START)
    CALL ReadInput()
    CALL InitializeGridArrays()
    CALL INGRID()
@@ -21,5 +23,7 @@ PROGRAM main
    CALL SetInitialConditions()
    CALL MainLoop()
    CALL WriteTecPlot(outputfile,'"I","J","JACOBIAN","rho","u","v","p","MACH"')
+   CALL CPU_TIME(FINISH)
+   WRITE(*,*) "TOTAL CPU TIME:",FINISH-START," SECONDS"
 
 END PROGRAM main

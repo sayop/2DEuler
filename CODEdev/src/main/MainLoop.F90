@@ -11,8 +11,10 @@ CONTAINS
 !-----------------------------------------------------------------------------!
   SUBROUTINE MainLoop()
 !-----------------------------------------------------------------------------!
+    USE io_m, ONLY: WriteErrorLog, WriteDataOut
     USE TimeIntegration_m
-    USE SimulationVars_m, ONLY: nadv, nmax, imin, imax, jmin, jmax, V, U, RMSerr
+    USE SimulationVars_m, ONLY: nadv, nmax, imin, imax, jmin, jmax, V, U, RMSerr, &
+                                ifinish
     USE SimulationSetup_m, ONLY: SetBoundaryConditions, SetTransformedVariables, &
                                  SetPrimativeVariables
 
@@ -25,10 +27,18 @@ CONTAINS
       ! Update Contravariant velocities that need to be updated
       ! in SetBoundaryConditions
       !CALL SetTransformedVariables()
-      WRITE(*,*) 'NADV=',nadv,'T=',t, 'DT=',dt, 'RMSerr=',RMSerr
-      IF(CheckConvergence() .EQ. 1) THEN
-        WRITE(*,*) 'NORMAL TERMINATION AT NADV=',nadv,'and RMSerr=',RMSerr
+      CALL CheckConvergence()
+      IF(IFINISH .EQ. 1 .OR. nadv .EQ. nmax) THEN
+        WRITE(*,'(A27,I6,A10,g15.6)') 'NORMAL TERMINATION AT NADV=',nadv, &
+                                      'and RMSerr=',RMSerr
+        CALL WriteErrorLog(nadv)
+        CALL WriteDataOut()
         return
+      ELSE
+        WRITE(*,'(A5,I6,A3,g15.6,A4,g15.6,A8,g15.6)') 'NADV=',nadv, &
+                                                     'T=',t, 'DT=', dt, &
+                                                     'RMSerr=',RMSerr
+        CALL WriteErrorLog(nadv)
       END IF
     END DO TimeLoop
 

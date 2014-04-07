@@ -1,0 +1,21 @@
+#Input file for tecplot print
+2-D Euler solver
+imax            71
+jmax            48
+ngl		3
+gridFile	grid.fine
+#Initial conditions
+density		4.0
+u		1.0
+v		0.0
+pressure	0.7142857
+gamma		1.4
+#Simulation parameters
+nmax		20000
+CFL		0.1
+errorLimit	1e-03
+#AUSMPW+ parameters
+alpha		0.0
+epsil		1
+limiter		1
+kappa		-1.0

@@ -5,7 +5,8 @@ MODULE AUSMPWplus_m
    USE Parameters_m, ONLY: wp
 
    IMPLICIT NONE
-   REAL(KIND=wp) :: alpha, limiter
+   REAL(KIND=wp) :: alpha, epsil, kappa
+   INTEGER :: limiter
 
 CONTAINS
 !-----------------------------------------------------------------------------!
@@ -28,13 +29,14 @@ CONTAINS
     ! FPhalf: Transformed flux in i-direction at i+1/2
     ! GPhalf: Transformed flux in j-direction at j+1/2
     REAL(KIND=wp), DIMENSION(4,incell,jncell) :: FPhalf, GPhalf
-    REAL(KIND=wp) :: XIX, XIY, ETAX, ETAY, JACOBIANavg, A1, &
+    REAL(KIND=wp) :: XIX, XIY, ETAX, ETAY, JACOBIANavg, A1, A2, &
                      rr, uu, vv, Pl, Pr, h0L, h0R, h0norm, &
+                     rrl, rrr, uul, uur, vvl, vvr, &
                      utildL, vtildL, utildR, vtildR, Cavg, &
                      MtildL, MtildR, MtildLplus, MtildRminus, &
-                     Pplus, Pminus, Pmin, fl, fr
+                     Pplus, Pminus, Pmin, fl, fr, Mavg
                      
-    REAL(KIND=wp), DIMENSION(4) :: UL, UR, XEPl, XEPr
+    REAL(KIND=wp), DIMENSION(4) :: UL, UR, VL, VR, XEPl, XEPr
     REAL(KIND=wp), DIMENSION(2) :: UCL, UCR
 
     !-----------------------------------
@@ -60,6 +62,8 @@ CONTAINS
     DF = 0.0_wp
     FPhalf = 0.0_wp
     GPhalf = 0.0_wp
+    XEPl = 0.0_wp
+    XEPr = 0.0_wp
     !
     ! Set transformed flux in along j-const lines at every (i+1/2) points
     !
@@ -72,6 +76,7 @@ CONTAINS
         ETAY = 0.5_wp * (PJPY(i,j) + PJPY(i+1,j))
         JACOBIANavg = 0.5_wp * (JACOBIAN(i,j) + JACOBIAN(i+1,j))
         A1 = sqrt(XIX ** 2 + XIY ** 2)
+        A2 = sqrt(ETAX ** 2 + ETAY ** 2)
         ! Set u- and v-velcotiy at i + 1/2
         ! First calculate left-extrapolated state vector and convert
         UL = LeftExtrapolateU('i',i,j)
@@ -80,15 +85,20 @@ CONTAINS
         vv = UL(3) / rr
         Pl = (cgamma - 1.0_wp) * ( UL(4) - &
              0.5_wp * rr * (uu ** 2 + vv ** 2) )
+!        VL = LeftExtrapolateV('i',i,j)
+!        rr = VL(1)
+!        uu = VL(2)
+!        vv = VL(3)
+!        Pl = VL(4)
         h0L = Pl * cgamma / (rr * (cgamma - 1.0_wp)) + &
               0.5_wp * (uu ** 2 + vv ** 2)
         !UCL = LeftExtrapolateUC('i',i,j)
         !utildL = UCL(1) / A1
         !vtildL = UCL(2) / A1
         utildL = (XIX * uu + XIY * vv) / A1
-        vtildL = (ETAX * uu + ETAY * vv) / A1
+        !vtildL = (ETAX * uu + ETAY * vv) / A1
+        vtildL = (ETAX * uu + ETAY * vv) / A2
         !utildL = XIX * uu / A1
-        !vtildL = ETAY * vv / A1
         ! Then calculate right-extrapolated state vector from i+1 point
         UR = RightExtrapolateU('i',i,j)
         rr = UR(1)
@@ -96,17 +106,21 @@ CONTAINS
         vv = UR(3) / rr
         Pr = (cgamma - 1.0_wp) * ( UR(4) - &
              0.5_wp * rr * (uu ** 2 + vv ** 2) )
+!        VR = RightExtrapolateV('j',i,j)
+!        rr = VR(1)
+!        uu = VR(2)
+!        vv = VR(3)
+!        Pr = VR(4)
         h0R = Pr * cgamma / (rr * (cgamma - 1.0_wp)) + &
               0.5_wp * (uu ** 2 + vv ** 2)
         !UCR = RightExtrapolateUC('i',i,j)
         !utildR = UCR(1) / A1
         !vtildR = UCR(2) / A1
         utildR = (XIX * uu + XIY * vv) / A1
-        vtildR = (ETAX * uu + ETAY * vv) / A1
+        !vtildR = (ETAX * uu + ETAY * vv) / A1
+        vtildR = (ETAX * uu + ETAY * vv) / A2
         !utildR = XIX * uu / A1
-        !vtildR = ETAY * vv / A1
         ! Calculate stagnation enthalpy normal to the interface
-        !h0norm = 0.5_wp * (h0L + h0R - 0.5_wp * (vtildL ** 2 + vtildR ** 2))
         h0norm = 0.5_wp * (h0L + h0R - 0.5_wp * (vtildL ** 2 + vtildR ** 2))
         ! Calculate cell averaged speed of sound
         ! Use Cavg for calculating Cs and then update to Cavg
@@ -153,7 +167,8 @@ CONTAINS
         ! Apply the weightings to MtildLplus, MtildRminus
         ! Now MtildLplus and MtildRminus become averaged Mach number
         ! on the cell face
-        IF(MtildLplus + MtildRminus .GE. 0.0) THEN
+        Mavg = MtildLplus + MtildRminus
+        IF(Mavg .GE. 0.0) THEN
           MtildLplus = MtildLplus + MtildRminus * ((1.0_wp - rr) * &
                        (1.0_wp + fr) - fl)
           MtildRminus = MtildRminus * rr * (1.0_wp + fr)
@@ -164,17 +179,26 @@ CONTAINS
         END IF
         ! Update FPhalf vector
         ! Use rr as a temporary variable to store coefficients
-        XEPl = Pl * LeftExtrapolateXE('i',i,j)
-        XEPr = Pr * RightExtrapolateXE('i',i,j)
+        !XEPl = Pl * LeftExtrapolateXE('i',i,j)
+        !XEPr = Pr * RightExtrapolateXE('i',i,j)
+        XEPl = 0.0_wp
+        XEPl(2) = Pl * XIX
+        XEPl(3) = Pl * XIY
+        XEPr = 0.0_wp
+        XEPr(2) = Pr * XIX
+        XEPr(3) = Pr * XIY
+
         DO n = 1, 4
-          rr = MtildLplus * Cavg * A1 * UL(n)
-          rr = rr + MtildRminus * Cavg * A1 * UR(n)
-          rr = rr + Pplus * XEPl(n) + Pminus * XEPr(n)
-          FPhalf(n,i,j) = rr / JACOBIANavg
+          FPhalf(n,i,j) = ( MtildLplus * Cavg * A1 * UL(n) + &
+                            MtildRminus * Cavg * A1 * UR(n) + &
+                            Pplus * XEPl(n) + Pminus * XEPr(n) ) / &
+                            JACOBIANavg
         END DO
       END DO
     END DO
 
+    XEPl = 0.0_wp
+    XEPr = 0.0_wp
     !
     ! Set transformed flux in along i-const lines at every (j+1/2) points
     !
@@ -186,7 +210,8 @@ CONTAINS
         ETAX = 0.5_wp * (PJPX(i,j) + PJPX(i,j+1))
         ETAY = 0.5_wp * (PJPY(i,j) + PJPY(i,j+1))
         JACOBIANavg = 0.5_wp * (JACOBIAN(i,j) + JACOBIAN(i,j+1))
-        A1 = sqrt(ETAX ** 2 + ETAY ** 2)
+        A1 = sqrt(XIX ** 2 + XIY ** 2)
+        A2 = sqrt(ETAX ** 2 + ETAY ** 2)
         ! Set u- and v-velcotiy at j + 1/2
         ! First calculate left-extrapolated state vector and convert
         UL = LeftExtrapolateU('j',i,j)
@@ -195,13 +220,19 @@ CONTAINS
         vv = UL(3) / rr
         Pl = (cgamma - 1.0_wp) * ( UL(4) - &
              0.5_wp * rr * (uu ** 2 + vv ** 2) )
+!        VL = LeftExtrapolateV('j',i,j)
+!        rr = VL(1)
+!        uu = VL(2)
+!        vv = VL(3)
+!        Pl = VL(4)
         h0L = Pl * cgamma / (rr * (cgamma - 1.0_wp)) + &
               0.5_wp * (uu ** 2 + vv ** 2)
         !UCL = LeftExtrapolateUC('j',i,j)
         !utildL = UCL(1) / A1
         !vtildL = UCL(2) / A1
+        !utildL = (XIX * uu + XIY * vv) / A1
         utildL = (XIX * uu + XIY * vv) / A1
-        vtildL = (ETAX * uu + ETAY * vv) / A1
+        vtildL = (ETAX * uu + ETAY * vv) / A2
         !utildL = XIX * uu / A1
         !vtildL = ETAY * vv / A1
         ! Then calculate right-extrapolated state vector from i+1 point
@@ -211,17 +242,23 @@ CONTAINS
         vv = UR(3) / rr
         Pr = (cgamma - 1.0_wp) * ( UR(4) - &
              0.5_wp * rr * (uu ** 2 + vv ** 2) )
+!        VR = RightExtrapolateV('j',i,j)
+!        rr = VR(1)
+!        uu = VR(2)
+!        vv = VR(3)
+!        Pr = VR(4)
         h0R = Pr * cgamma / (rr * (cgamma - 1.0_wp)) + &
               0.5_wp * (uu ** 2 + vv ** 2)
         !UCR = RightExtrapolateUC('j',i,j)
         !utildR = UCR(1) / A1
         !vtildR = UCR(2) / A1
+        !utildR = (XIX * uu + XIY * vv) / A1
         utildR = (XIX * uu + XIY * vv) / A1
-        vtildR = (ETAX * uu + ETAY * vv) / A1
+        vtildR = (ETAX * uu + ETAY * vv) / A2
         !utildR = XIX * uu / A1
         !vtildR = ETAY * vv / A1
         ! Calculate stagnation enthalpy normal to the interface
-        h0norm = 0.5_wp * (h0L + h0R - 0.5_wp * (vtildL ** 2 + vtildR ** 2))
+        h0norm = 0.5_wp * (h0L + h0R - 0.5_wp * (utildL ** 2 + utildR ** 2))
         ! Calculate cell averaged speed of sound
         ! Use Cavg for calculating Cs and then update to Cavg
         ! Use rr temporarily to store half of sum of vtildL and vtildR
@@ -267,7 +304,8 @@ CONTAINS
         ! Apply the weightings to MtildLplus, MtildRminus
         ! Now MtildLplus and MtildRminus become averaged Mach number
         ! on the cell face
-        IF(MtildLplus + MtildRminus .GE. 0.0) THEN
+        Mavg = MtildLplus + MtildRminus
+        IF(Mavg .GE. 0.0) THEN
           MtildLplus = MtildLplus + MtildRminus * ((1.0_wp - rr) * &
                        (1.0_wp + fr) - fl)
           MtildRminus = MtildRminus * rr * (1.0_wp + fr)
@@ -278,13 +316,19 @@ CONTAINS
         END IF
         ! Update GPhalf vector
         ! Use rr as a temporary variable to store coefficients
-        XEPl = Pl * LeftExtrapolateXE('j',i,j)
-        XEPr = Pr * RightExtrapolateXE('j',i,j)
+        !XEPl = Pl * LeftExtrapolateXE('j',i,j)
+        !XEPr = Pr * RightExtrapolateXE('j',i,j)
+        XEPl = 0.0_wp
+        XEPl(2) = Pl * ETAX
+        XEPl(3) = Pl * ETAY
+        XEPr = 0.0_wp
+        XEPr(2) = Pr * ETAX
+        XEPr(3) = Pr * ETAY
         DO n = 1, 4
-          rr = MtildLplus * Cavg * A1 * UL(n)
-          rr = rr + MtildRminus * Cavg * A1 * UR(n)
-          rr = rr + Pplus * XEPl(n) + Pminus * XEPr(n)
-          GPhalf(n,i,j) = rr / JACOBIANavg
+          GPhalf(n,i,j) = ( MtildLplus * Cavg * A2 * UL(n) + &
+                            MtildRminus * Cavg * A2 * UR(n) + &
+                            Pplus * XEPl(n) + Pminus * XEPr(n) ) / &
+                            JACOBIANavg
         END DO
       END DO
     END DO
@@ -302,70 +346,238 @@ CONTAINS
   END SUBROUTINE SetAUSMPWplus
 
   FUNCTION LeftExtrapolateU(axis,i,j) RESULT(UL)
-    USE SimulationVars_m, ONLY: U
+    USE SimulationVars_m, ONLY: U, imin, jmin
     IMPLICIT NONE
-    INTEGER :: i, j, n, im, jm
+    INTEGER :: i, j, n, im, jm, ip, jp
     CHARACTER(LEN=1) :: axis
     REAL(KIND=wp), DIMENSION(4) :: UL
+    ! DelUmHalf: Delta_U_i-1/2 = U_i - U_i-1
+    ! DelUpHalf: Delta_U_i+1/2 = U_i+1 - U_i
+    ! phi1 = phi(rL)
+    ! phi2 = phi(1/rL)
+    REAL(KIND=wp) :: DelUmHalf, DelUpHalf, rL, phi1, phi2, beta
 
     IF(axis .EQ. 'i') THEN
       im = -1
       jm = 0
+      ip = 1
+      jp = 0
     ELSEIF(axis .EQ. 'j') THEN
       im = 0
       jm = -1
+      ip = 0
+      jp = 1
     END IF
+    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
     DO n = 1, 4
-      UL(n) = U(n,i,j) + limiter * (U(n,i,j) - U(n,i+im,j+jm)) * 0.5_wp
+      IF(i .EQ. imin .OR. j .EQ. jmin) THEN
+        UL(n) = U(n,i,j)
+        CYCLE
+      END IF
+      DelUmHalf = U(n,i,j) - U(n,i+im,j+im)
+      DelUpHalf = U(n,i+ip,j+jp) - U(n,i,j)
+      SELECT CASE(limiter)
+      CASE(0)
+        phi1 = DelUmHalf
+        phi2 = DelUpHalf
+      CASE(1)
+        !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+        phi1 = minmod(DelUmHalf, beta*DelUpHalf)
+        phi2 = minmod(DelUpHalf, beta*DelUmHalf)
+      END SELECT
+      UL(n) = U(n,i,j) + 0.25_wp * epsil * (&
+              (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
     END DO
   END FUNCTION LeftExtrapolateU
 
-  FUNCTION LeftExtrapolateUC(axis,i,j) RESULT(UCL)
-    USE SimulationVars_m, ONLY: UCON
-    IMPLICIT NONE
-    INTEGER :: i, j, n, im, jm
-    CHARACTER(LEN=1) :: axis
-    REAL(KIND=wp), DIMENSION(2) :: UCL
+!  FUNCTION LeftExtrapolateV(axis,i,j) RESULT(VL)
+!    USE SimulationVars_m, ONLY: V, imin, jmin
+!    IMPLICIT NONE
+!    INTEGER :: i, j, n, im, jm, ip, jp
+!    CHARACTER(LEN=1) :: axis
+!    REAL(KIND=wp), DIMENSION(4) :: VL
+!    ! DelUmHalf: Delta_U_i-1/2 = U_i - U_i-1
+!    ! DelUpHalf: Delta_U_i+1/2 = U_i+1 - U_i
+!    ! phi1 = phi(rL)
+!    ! phi2 = phi(1/rL)
+!    REAL(KIND=wp) :: DelVmHalf, DelVpHalf, rL, phi1, phi2, beta
+!
+!    IF(axis .EQ. 'i') THEN
+!      im = -1
+!      jm = 0
+!      ip = 1
+!      jp = 0
+!    ELSEIF(axis .EQ. 'j') THEN
+!      im = 0
+!      jm = -1
+!      ip = 0
+!      jp = 1
+!    END IF
+!    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
+!    DO n = 1, 4
+!      IF(i .EQ. imin .OR. j .EQ. jmin) THEN
+!        VL(n) = V(n,i,j)
+!        CYCLE
+!      END IF
+!      DelVmHalf = V(n,i,j) - V(n,i+im,j+im)
+!      DelVpHalf = V(n,i+ip,j+jp) - V(n,i,j)
+!      SELECT CASE(limiter)
+!      CASE(0)
+!        phi1 = DelVmHalf
+!        phi2 = DelvpHalf
+!      CASE(1)
+!        !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+!        phi1 = minmod(DelVmHalf, beta*DelVpHalf)
+!        phi2 = minmod(DelvpHalf, beta*DelVmHalf)
+!      END SELECT
+!      VL(n) = V(n,i,j) + 0.25_wp * epsil * (&
+!              (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+!    END DO
+!  END FUNCTION LeftExtrapolateV
 
-    IF(axis .EQ. 'i') THEN
-      im = -1
-      jm = 0
-    ELSEIF(axis .EQ. 'j') THEN
-      im = 0
-      jm = -1
-    END IF
-    DO n = 1, 2
-      UCL(n) = UCON(n,i,j) + limiter * &
-               (UCON(n,i,j) - UCON(n,i+im,j+jm)) * 0.5_wp
-    END DO
-  END FUNCTION LeftExtrapolateUC
+!  FUNCTION LeftExtrapolateUC(axis,i,j) RESULT(UCL)
+!    USE SimulationVars_m, ONLY: UCON, imin, jmin
+!    IMPLICIT NONE
+!    INTEGER :: i, j, n, im, jm, ip, jp
+!    CHARACTER(LEN=1) :: axis
+!    REAL(KIND=wp), DIMENSION(2) :: UCL
+!    REAL(KIND=wp) :: DelUmHalf, DelUpHalf, rL, phi1, phi2, beta
+!
+!    IF(axis .EQ. 'i') THEN
+!      im = -1
+!      jm = 0
+!      ip = 1
+!      jp = 0
+!    ELSEIF(axis .EQ. 'j') THEN
+!      im = 0
+!      jm = -1
+!      ip = 0
+!      jp = 1
+!    END IF
+!    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
+!    DO n = 1, 2
+!      IF(i .EQ. imin .OR. j .EQ. jmin) THEN
+!        UCL(n) = UCON(n,i,j)
+!        CYCLE
+!      END IF
+!      DelUmHalf = UCON(n,i,j) - UCON(n,i+im,j+im)
+!      DelUpHalf = UCON(n,i+ip,j+jp) - UCON(n,i,j)
+!      SELECT CASE(limiter)
+!      CASE(0)
+!        phi1 = DelUmHalf
+!        phi2 = DelUpHalf
+!      CASE(1)
+!        !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+!        phi1 = minmod(DelUmHalf, beta*DelUpHalf)
+!        phi2 = minmod(DelUpHalf, beta*DelUmHalf)
+!      END SELECT
+!      UCL(n) = UCON(n,i,j) + 0.25_wp * epsil * (&
+!               (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+!    END DO
+!  END FUNCTION LeftExtrapolateUC
 
-  FUNCTION LeftExtrapolateXE(axis,i,j) RESULT(XE)
-    USE GridJacobian_m, ONLY: PIPX, PIPY, PJPX, PJPY
-    IMPLICIT NONE
-    INTEGER :: i, j, n
-    CHARACTER(LEN=1) :: axis
-    ! XE(1) = X(4) = 0.0
-    ! XE(2): XI_x in i-direction or ETA_x in j-direction
-    ! XE(3): XI_y in i-direction or ETA_y in j-direction
-    REAL(KIND=wp), DIMENSION(4) :: XE
-
-    XE = 0.0_wp
-    IF(axis .EQ. 'i') THEN
-      XE(2) = PIPX(i,j) + limiter * (PIPX(i,j) - PIPX(i-1,j)) * 0.5_wp
-      XE(3) = PIPY(i,j) + limiter * (PIPY(i,j) - PIPY(i-1,j)) * 0.5_wp
-    ELSEIF(axis .EQ. 'j') THEN
-      XE(2) = PJPX(i,j) + limiter * (PJPX(i,j) - PJPX(i,j-1)) * 0.5_wp
-      XE(3) = PJPY(i,j) + limiter * (PJPY(i,j) - PJPY(i,j-1)) * 0.5_wp
-    END IF
-  END FUNCTION LeftExtrapolateXE
+!  FUNCTION LeftExtrapolateXE(axis,i,j) RESULT(XE)
+!    USE GridJacobian_m, ONLY: PIPX, PIPY, PJPX, PJPY
+!    USE SimulationVars_m, ONLY: imin, jmin
+!    IMPLICIT NONE
+!    INTEGER :: i, j, n, im, jm, ip, jp
+!    CHARACTER(LEN=1) :: axis
+!    ! XE(1) = X(4) = 0.0
+!    ! XE(2): XI_x in i-direction or ETA_x in j-direction
+!    ! XE(3): XI_y in i-direction or ETA_y in j-direction
+!    REAL(KIND=wp), DIMENSION(4) :: XE
+!    REAL(KIND=wp) :: DelUmHalf, DelUpHalf, rL, phi1, phi2, beta
+!
+!    XE = 0.0_wp
+!    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
+!    IF(axis .EQ. 'i') THEN
+!      IF(i .EQ. imin) THEN
+!        ! left boundary
+!        XE(2) = PIPX(i,j)
+!        XE(3) = PIPY(i,j)
+!      ELSE
+!        im = -1
+!        jm = 0
+!        ip = 1
+!        jp = 0
+!        ! Set XI_X
+!        DelUmHalf = PIPX(i,j) - PIPX(i+im,j+im)
+!        DelUpHalf = PIPX(i+ip,j+jp) - PIPX(i,j)
+!        SELECT CASE(limiter)
+!        CASE(0)
+!          phi1 = DelUmHalf
+!          phi2 = DelUpHalf
+!        CASE(1)
+!          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+!          phi1 = minmod(DelUmHalf, beta*DelUpHalf)
+!          phi2 = minmod(DelUpHalf, beta*DelUmHalf)
+!        END SELECT
+!        XE(2) = PIPX(i,j) + 0.25_wp * epsil * (&
+!                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+!        ! Set XI_Y
+!        DelUmHalf = PIPY(i,j) - PIPY(i+im,j+im)
+!        DelUpHalf = PIPY(i+ip,j+jp) - PIPY(i,j)
+!        SELECT CASE(limiter)
+!        CASE(0) 
+!          phi1 = DelUmHalf
+!          phi2 = DelUpHalf
+!        CASE(1)
+!          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+!          phi1 = minmod(DelUmHalf, beta*DelUpHalf)
+!          phi2 = minmod(DelUpHalf, beta*DelUmHalf)
+!        END SELECT
+!        XE(3) = PIPY(i,j) + 0.25_wp * epsil * (&
+!                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+!      END IF
+!    ELSEIF(axis .EQ. 'j') THEN
+!      IF(j .EQ. jmin) THEN
+!        ! left boundary
+!        XE(2) = PJPX(i,j)
+!        XE(3) = PJPY(i,j)
+!      ELSE
+!        im = 0
+!        jm = -1
+!        ip = 0
+!        jp = 1
+!        ! Set ETA_X
+!        DelUmHalf = PJPX(i,j) - PJPX(i+im,j+im)
+!        DelUpHalf = PJPX(i+ip,j+jp) - PJPX(i,j)
+!        SELECT CASE(limiter)
+!        CASE(0) 
+!          phi1 = DelUmHalf
+!          phi2 = DelUpHalf
+!        CASE(1)
+!          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+!          phi1 = minmod(DelUmHalf, beta*DelUpHalf)
+!          phi2 = minmod(DelUpHalf, beta*DelUmHalf)
+!        END SELECT
+!        XE(2) = PJPX(i,j) + 0.25_wp * epsil * (&
+!                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+!        ! Set ETA_Y
+!        DelUmHalf = PJPY(i,j) - PJPY(i+im,j+im)
+!        DelUpHalf = PJPY(i+ip,j+jp) - PJPY(i,j)
+!        SELECT CASE(limiter)
+!        CASE(0) 
+!          phi1 = DelUmHalf
+!          phi2 = DelUpHalf
+!        CASE(1)
+!          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+!          phi1 = minmod(DelUmHalf, beta*DelUpHalf)
+!          phi2 = minmod(DelUpHalf, beta*DelUmHalf)
+!        END SELECT
+!        XE(3) = PJPY(i,j) + 0.25_wp * epsil * (&
+!                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+!      END IF
+!    END IF
+!  END FUNCTION LeftExtrapolateXE
 
   FUNCTION RightExtrapolateU(axis,i,j) RESULT(UR)
-    USE SimulationVars_m, ONLY: U
+    USE SimulationVars_m, ONLY: U, imax, jmax
     IMPLICIT NONE
     INTEGER :: i, j, n, ip, jp, ipp, jpp
     CHARACTER(LEN=1) :: axis
     REAL(KIND=wp), DIMENSION(4) :: UR
+    REAL(KIND=wp) :: DelUpHalf, DelUppHalf, rR, phi1, phi2, beta
 
     IF(axis .EQ. 'i') THEN
       ip = 1
@@ -378,18 +590,78 @@ CONTAINS
       jp = 1
       jpp = 2
     END IF
+    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
     DO n = 1, 4
-      UR(n) = U(n,i+ip,j+jp) + limiter * (U(n,i+ip,j+jp) - &
-              U(n,i+ipp,j+jpp)) * 0.5_wp
+      IF(i+ip .EQ. imax .OR. j+jp .EQ. jmax) THEN
+        ! Right boundary
+        UR(n) = U(n,i+ip,j+jp)
+        CYCLE
+      END IF
+      DelUpHalf = U(n,i+ip,j+jp) - U(n,i,j)
+      DelUppHalf = U(n,i+ipp,j+jpp) - U(n,i+ip,j+jp)
+      SELECT CASE(limiter)
+      CASE(0)
+        phi1 = DelUpHalf
+        phi2 = DelUppHalf
+      CASE(1)
+        !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+        phi1 = minmod(DelUpHalf, beta*DelUppHalf)
+        phi2 = minmod(DelUppHalf, beta*DelUpHalf)
+      END SELECT
+      UR(n) = U(n,i+ip,j+jp) - 0.25_wp * epsil * (&
+              (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
     END DO
   END FUNCTION RightExtrapolateU
 
+  FUNCTION RightExtrapolateV(axis,i,j) RESULT(VR)
+    USE SimulationVars_m, ONLY: V, imax, jmax
+    IMPLICIT NONE
+    INTEGER :: i, j, n, ip, jp, ipp, jpp
+    CHARACTER(LEN=1) :: axis
+    REAL(KIND=wp), DIMENSION(4) :: VR
+    REAL(KIND=wp) :: DelVpHalf, DelVppHalf, rR, phi1, phi2, beta
+
+    IF(axis .EQ. 'i') THEN
+      ip = 1
+      ipp = 2
+      jp = 0
+      jpp = 0
+    ELSEIF(axis .EQ. 'j') THEN
+      ip = 0
+      ipp = 0
+      jp = 1
+      jpp = 2
+    END IF
+    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
+    DO n = 1, 4
+      IF(i+ip .EQ. imax .OR. j+jp .EQ. jmax) THEN
+        ! Right boundary
+        VR(n) = V(n,i+ip,j+jp)
+        CYCLE
+      END IF
+      DelVpHalf = V(n,i+ip,j+jp) - V(n,i,j)
+      DelVppHalf = V(n,i+ipp,j+jpp) - V(n,i+ip,j+jp)
+      SELECT CASE(limiter)
+      CASE(0)
+        phi1 = DelVpHalf
+        phi2 = DelVppHalf
+      CASE(1)
+        !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+        phi1 = minmod(DelVpHalf, beta*DelVppHalf)
+        phi2 = minmod(DelVppHalf, beta*DelVpHalf)
+      END SELECT
+      VR(n) = V(n,i+ip,j+jp) - 0.25_wp * epsil * (&
+              (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+    END DO
+  END FUNCTION RightExtrapolateV
+
   FUNCTION RightExtrapolateUC(axis,i,j) RESULT(UCR)
-    USE SimulationVars_m, ONLY: UCON
+    USE SimulationVars_m, ONLY: UCON, imax, jmax
     IMPLICIT NONE
     INTEGER :: i, j, n, ip, jp, ipp, jpp
     CHARACTER(LEN=1) :: axis
     REAL(KIND=wp), DIMENSION(2) :: UCR
+    REAL(KIND=wp) :: DelUpHalf, DelUppHalf, rR, phi1, phi2, beta
 
     IF(axis .EQ. 'i') THEN
       ip = 1
@@ -402,29 +674,126 @@ CONTAINS
       jp = 1
       jpp = 2
     END IF
+    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
     DO n = 1, 2
-      UCR(n) = UCON(n,i+ip,j+jp) + limiter * (UCON(n,i+ip,j+jp) - &
-               UCON(n,i+ipp,j+jpp)) * 0.5_wp
+      IF(i+ip .EQ. imax .OR. j+jp .EQ. jmax) THEN
+        ! Right boundary
+        UCR(n) = UCON(n,i+ip,j+jp)
+        CYCLE
+      END IF
+      DelUpHalf = UCON(n,i+ip,j+jp) - UCON(n,i,j)
+      DelUppHalf = UCON(n,i+ipp,j+jpp) - UCON(n,i+ip,j+jp)
+      SELECT CASE(limiter)
+      CASE(0)
+        phi1 = DelUpHalf
+        phi2 = DelUppHalf
+      CASE(1)
+        !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+        phi1 = minmod(DelUpHalf, beta*DelUppHalf)
+        phi2 = minmod(DelUppHalf, beta*DelUpHalf)
+      END SELECT
+      UCR(n) = UCON(n,i+ip,j+jp) - 0.25_wp * epsil * (&
+              (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
     END DO
   END FUNCTION RightExtrapolateUC
+
   FUNCTION RightExtrapolateXE(axis,i,j) RESULT(XE)
     USE GridJacobian_m, ONLY: PIPX, PIPY, PJPX, PJPY
+    USE SimulationVars_m, ONLY: imax, jmax
     IMPLICIT NONE
-    INTEGER :: i, j, n
+    INTEGER :: i, j, n, ip, jp, ipp, jpp
     CHARACTER(LEN=1) :: axis
     ! XE(1) = XE(4) = 0.0
     ! XE(2): XI_x in i-direction or ETA_x in j-direction
     ! XE(3): XI_y in i-direction or ETA_y in j-direction
     REAL(KIND=wp), DIMENSION(4) :: XE
+    REAL(KIND=wp) :: DelUpHalf, DelUppHalf, rR, phi1, phi2, beta
 
     XE = 0.0_wp
+    beta = (3.0_wp - kappa) / (1.0_wp - kappa)
     IF(axis .EQ. 'i') THEN
-      XE(2) = PIPX(i+1,j) + limiter * (PIPX(i+1,j) - PIPX(i+2,j)) * 0.5_wp
-      XE(3) = PIPY(i+1,j) + limiter * (PIPY(i+1,j) - PIPY(i+2,j)) * 0.5_wp
+      ip = 1
+      ipp = 2
+      jp = 0
+      jpp = 0
+      IF(i+ip .EQ. imax) THEN
+        XE(2) = PIPX(i+ip,j+jp)
+        XE(3) = PIPY(i+ip,j+jp)
+      ELSE
+        ! Set XI_X
+        DelUpHalf = PIPX(i+ip,j+jp) - PIPX(i,j)
+        DelUppHalf = PIPX(i+ipp,j+jpp) - PIPX(i+ip,j+jp)
+        SELECT CASE(limiter)
+        CASE(0)
+          phi1 = DelUpHalf
+          phi2 = DelUppHalf
+        CASE(1)
+          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+          phi1 = minmod(DelUpHalf, beta*DelUppHalf)
+          phi2 = minmod(DelUppHalf, beta*DelUpHalf)
+        END SELECT
+        XE(2) = PIPX(i+ip,j+jp) - 0.25_wp * epsil * (&
+                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+        ! Set XI_Y
+        DelUpHalf = PIPY(i+ip,j+jp) - PIPY(i,j)
+        DelUppHalf = PIPY(i+ipp,j+jpp) - PIPY(i+ip,j+jp)
+        SELECT CASE(limiter)
+        CASE(0)
+          phi1 = DelUpHalf
+          phi2 = DelUppHalf
+        CASE(1)
+          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+          phi1 = minmod(DelUpHalf, beta*DelUppHalf)
+          phi2 = minmod(DelUppHalf, beta*DelUpHalf)
+        END SELECT
+        XE(3) = PIPY(i+ip,j+jp) - 0.25_wp * epsil * (&
+                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+      END IF
     ELSEIF(axis .EQ. 'j') THEN
-      XE(2) = PJPX(i,j+1) + limiter * (PJPX(i,j+1) - PJPX(i,j+2)) * 0.5_wp
-      XE(3) = PJPY(i,j+1) + limiter * (PJPY(i,j+1) - PJPY(i,j+2)) * 0.5_wp
+      ip = 0
+      ipp = 0
+      jp = 1
+      jpp = 2
+      IF(j+jp .EQ. jmax) THEN
+        XE(2) = PJPX(i+ip,j+jp)
+        XE(3) = PJPY(i+ip,j+jp)
+      ELSE
+        ! Set ETA_X
+        DelUpHalf = PJPX(i+ip,j+jp) - PJPX(i,j)
+        DelUppHalf = PJPX(i+ipp,j+jpp) - PJPX(i+ip,j+jp)
+        SELECT CASE(limiter)
+        CASE(0)
+          phi1 = DelUpHalf
+          phi2 = DelUppHalf
+        CASE(1)
+          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+          phi1 = minmod(DelUpHalf, beta*DelUppHalf)
+          phi2 = minmod(DelUppHalf, beta*DelUpHalf)
+        END SELECT
+        XE(2) = PJPX(i+ip,j+jp) - 0.25_wp * epsil * (&
+                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+        ! Set ETA_Y
+        DelUpHalf = PJPY(i+ip,j+jp) - PJPY(i,j)
+        DelUppHalf = PJPY(i+ipp,j+jpp) - PJPY(i+ip,j+jp)
+        SELECT CASE(limiter)
+        CASE(0)
+          phi1 = DelUpHalf
+          phi2 = DelUppHalf
+        CASE(1)
+          !rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
+          phi1 = minmod(DelUpHalf, beta*DelUppHalf)
+          phi2 = minmod(DelUppHalf, beta*DelUpHalf)
+        END SELECT
+        XE(3) = PJPY(i+ip,j+jp) - 0.25_wp * epsil * (&
+                (1.0_wp - kappa) * phi1 + (1.0_wp + kappa) * phi2)
+      END IF
     END IF
   END FUNCTION RightExtrapolateXE
 
+  FUNCTION minmod(xx,yy) RESULT(phi)
+    IMPLICIT NONE
+    REAL(KIND=wp) :: xx, yy, phi
+
+    phi = sign(1.0_wp,xx) * max(0.0_wp, min(abs(xx),sign(1.0_wp,xx)*yy))
+  END FUNCTION minmod
 END MODULE AUSMPWplus_m
