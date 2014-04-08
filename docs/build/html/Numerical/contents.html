@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Numerical Method &mdash; 2DEuler 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="2DEuler 0.0.1 documentation" href="../index.html" />
+    <link rel="prev" title="Code development" href="../CodeDevel/contents.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../CodeDevel/contents.html" title="Code development"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">2DEuler 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="numerical-method">
+<h1>Numerical Method<a class="headerlink" href="#numerical-method" title="Permalink to this headline">¶</a></h1>
+<p>During each time-integration step, the code calculate the fluxes <span class="math">\(\vec{F'}_{i+1/2,j}\)</span> at every &#8220;<span class="math">\(i\)</span>&#8221; half-point locations, and <span class="math">\(\vec{G'}_{i,j+1/2}\)</span> at every &#8220;<span class="math">\(j\)</span>&#8221; half-point locations. In order to obtain the flux terms properly treated with consideration of characteristics of wave propagation, MUSCL differencing should first be used to extrapolate the state vectors to every half point locations. After then AUSMPW+ scheme applies to those points for solving the flux terms.</p>
+<div class="section" id="muscl-with-limiter">
+<h2>MUSCL with limiter<a class="headerlink" href="#muscl-with-limiter" title="Permalink to this headline">¶</a></h2>
+<p>The extrapolated state vector can be written:</p>
+<div class="math">
+\[\vec{U}^{L}_{i+\frac{1}{2}} = \vec{U}_{i} + \frac{\epsilon }{4} \Delta \vec{U}_{i-\frac{1}{2}} \left \{ (1+\kappa)\left[\varphi \left(\text{r}^{L}\right)\right] + (1+\kappa)\text{r}^{L}\left[\varphi\left ( \frac{1}{\text{r}^{L}} \right ) \right ] \right \}\]</div>
+<p>where</p>
+<div class="math">
+\[\text{r}^{L} = \frac{\Delta \vec{U}_{i+\frac{1}{2}}}{\Delta \vec{U}_{i-\frac{1}{2}}} = \frac{\vec{U}_{i+1} - \vec{U}_{i}}{\vec{U}_{i} - \vec{U}_{i-1}}\]</div>
+<div class="math">
+\[\vec{U}^{R}_{i+\frac{1}{2}} = \vec{U}_{i+1} - \frac{\epsilon}{4} \Delta \vec{U}_{i+\frac{3}{2}} \left \{ \left ( 1+\kappa \right ) \left [ \varphi\left ( \frac{1}{\text{r}^{R}} \right ) \right ] + \left ( 1+\kappa \right ) \text{r}^{L} \left [ \varphi \left ( \text{r}^{R} \right ) \right ] \right \}\]</div>
+<p>where</p>
+<div class="math">
+\[\text{r}^{R} = \frac{\Delta \vec{U}_{i+\frac{1}{2}}}{\Delta \vec{U}_{i+\frac{2}{3}}} = \frac{\vec{U}_{i+1} - \vec{U}_{i}}{\vec{U}_{i+2} - \vec{U}_{i+1}}\]</div>
+</div>
+<div class="section" id="ausmpw-scheme-flux-splitting-with-pressure-weight">
+<h2>AUSMPW+ scheme: Flux Splitting with pressure weight<a class="headerlink" href="#ausmpw-scheme-flux-splitting-with-pressure-weight" title="Permalink to this headline">¶</a></h2>
+<p>General time-integration in CFD solver should follow the algebraic equation of state- and flux-vectors as shown below:</p>
+<div class="math">
+\[\vec{U}^{n+1}_{i,j} = \vec{U}^{n}_{i,j} - \Delta t^{n}_{i,j} J_{i,j} \left [ \left ( \vec{F'}_{i+\frac{1}{2},j} - \vec{F'}_{i-\frac{1}{2},j} \right ) + \left ( \vec{G'}_{i,j+\frac{1}{2}} - \vec{G'}_{i,j-\frac{1}{2}} \right ) \right ]^{n}\]</div>
+<p>where the time-step restriction at every grid cell is</p>
+<div class="math">
+\[\Delta t^{n}_{i,j} = \left \{ \frac{CFL}{|\tilde{U}| + |\tilde{V}| + c \sqrt{ \xi^{2}_{x} + \xi^{2}_{y} + \eta^{2}_{x} + \eta^{2}_{y} + 2 |\xi_{x} \eta_{x} + \xi_{y} \eta_{y} } | } \right \}^{n}_{i,j}\]</div>
+<p>In the above equations, AUSMPW+ scheme applies to calculate the transformed flux vectors at every half points. In this scheme, the values of Mach numbers and pressures are calculated at the cell interfaces and split into the left- and right-extrapolated components. The scheme employed flux vectors can be determined as:</p>
+<div class="math">
+\[\begin{split}\vec{F'} = \frac{\widetilde{\overline{M}}^{+}_{L} C_{avg} A_{1}}{J} \begin{bmatrix} \rho \\ \rho u \\ \rho v \\ \left ( E_{t} + p \right ) \end{bmatrix}_{L} + \frac{\widetilde{\overline{M}}^{-}_{R} C_{avg} A_{1}}{J} \begin{bmatrix} \rho \\ \rho u \\ \rho v \\ \left ( E_{t} + p \right ) \end{bmatrix}_{R} + \frac{P^{+}}{J} \begin{bmatrix} 0 \\ \xi_{x}p\\ \xi_{y}p\\ 0 \end{bmatrix}_{L} + \frac{P^{-}}{J} \begin{bmatrix} 0 \\ \xi_{x}p\\ \xi_{y}p\\ 0 \end{bmatrix}_{R}\end{split}\]</div>
+<p>where</p>
+<div class="math">
+\[A_{1} = \sqrt{\xi_{x}^{2} + \xi_{y}^{2}}\]</div>
+<div class="math">
+\[\begin{split}\vec{G'} = \frac{\widetilde{\overline{M}}^{+}_{L} C_{avg} A_{1}}{J} \begin{bmatrix} \rho \\ \rho u \\ \rho v \\ \left ( E_{t} + p \right ) \end{bmatrix}_{L} + \frac{\widetilde{\overline{M}}^{-}_{R} C_{avg} A_{1}}{J} \begin{bmatrix} \rho \\ \rho u \\ \rho v \\ \left ( E_{t} + p \right ) \end{bmatrix}_{R} + \frac{P^{+}}{J} \begin{bmatrix} 0 \\ \eta_{x}p\\ \eta_{y}p\\ 0 \end{bmatrix}_{L} + \frac{P^{-}}{J} \begin{bmatrix} 0 \\ \eta_{x}p\\ \eta_{y}p\\ 0 \end{bmatrix}_{R}\end{split}\]</div>
+<div class="math">
+\[A_{1} = \sqrt{\eta_{x}^{2} + \eta_{y}^{2}}\]</div>
+<p>One thing to keep carefully in mind is that grid metrics quantities should not be left- and right- extrapolated because these quantities are transportable flow quantities but static grid-point related quantities.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Numerical Method</a><ul>
+<li><a class="reference internal" href="#muscl-with-limiter">MUSCL with limiter</a></li>
+<li><a class="reference internal" href="#ausmpw-scheme-flux-splitting-with-pressure-weight">AUSMPW+ scheme: Flux Splitting with pressure weight</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../CodeDevel/contents.html"
+                        title="previous chapter">Code development</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/Numerical/contents.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../CodeDevel/contents.html" title="Code development"
+             >previous</a> |</li>
+        <li><a href="../index.html">2DEuler 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Sayop Kim.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>

@@ -178,7 +178,6 @@ CONTAINS
 !                            JACOBIANavg
            FPhalf(n,i,j) = FPhalf(n,i,j) / JACOBIANavg
         END DO
-
       END DO
     END DO
 

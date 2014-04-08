@@ -31,8 +31,6 @@ CONTAINS
       IF(IFINISH .EQ. 1 .OR. nadv .EQ. nmax) THEN
         WRITE(*,'(A27,I6,A10,g15.6)') 'NORMAL TERMINATION AT NADV=',nadv, &
                                       'and RMSerr=',RMSerr
-        CALL WriteErrorLog(nadv)
-        CALL WriteDataOut()
         return
       ELSE
         WRITE(*,'(A5,I6,A3,g15.6,A4,g15.6,A8,g15.6)') 'NADV=',nadv, &
@@ -41,6 +39,8 @@ CONTAINS
         CALL WriteErrorLog(nadv)
       END IF
     END DO TimeLoop
+    CALL WriteErrorLog(nadv)
+    CALL WriteDataOut()
 
   END SUBROUTINE MainLoop
 END MODULE MainLoop_m
