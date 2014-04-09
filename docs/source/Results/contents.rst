@@ -10,10 +10,15 @@ The grid used in this project has a resolution of 71 X 48 in i- and j-directions
    :width: 60%
 
 
-1st order accuracy (CFL = 0.8): CASE 1
---------------------------------------
 
-MUSCL differencing setup: :math:`\epsilon` = 0
+
+
+CASE 1
+------
+
+- 1st order accuracy (CFL = 0.8)
+
+- MUSCL differencing setup: :math:`\epsilon` = 0
 
 The first case in this project was set to run with first order accurate with CFL = 0.8. Since this setup employs the first order accuracy, the MUSCL differencing uses neighborting one points from either left or right point. For this setup, :math:`\epsilon` was set to zero in the MUSCL diferencing extrapolation equations in 'Numerical Method' section.
 
@@ -25,10 +30,12 @@ As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to for
    :width: 60%
 
 
-2nd order accuracy MUSCL without flux limiter (CFL = 0.7): CASE 2
------------------------------------------------------------------
+CASE 2
+------
 
-MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\varphi` = 1, :math:`\kappa` = -1
+- 2nd order accuracy MUSCL without flux limiter (CFL = 0.7): CASE 2
+
+- MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\varphi` = 1, :math:`\kappa` = -1
 
 The second trial for this project is made for running the Euler solver with higher order accurate MUSCL differencing. In this case, by setting :math:`\varphi` to 1 and :math:`\kappa` to -1, the scheme yields 2nd order accurate, fully upwind differencing.
 
@@ -38,10 +45,12 @@ Since multiple trials with different CFL number gives limitation of CFL number u
    :width: 60%
 
 
-2nd order accuracy MUSCL with minmod limiter (CFL = 0.7): CASE 3
-----------------------------------------------------------------
+CASE 3
+------
 
-MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\kappa` = -1, :math:`\varphi`: set by minmod limiter
+- 2nd order accuracy MUSCL with minmod limiter (CFL = 0.7)
+
+- MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\kappa` = -1, :math:`\varphi`: set by minmod limiter
 
 For the final case running, the second order accurate with minmod limiter is employed to introduce the TVD (Total Variation Diminishing) scheme. The figure shown below is the result of Mach number calculated from the CASE #3. This looks qualitatively same as the second result.
 
@@ -88,8 +97,10 @@ From the comparison of Mach number distribution along the bottom wall, very noti
 .. image:: ./images/CombinedMach.png
    :width: 60%
 
-Effect of CFL (CASE #3)
------------------------
+
+
+Effect of CFL (for CASE 3)
+--------------------------
 
 Following figures show the effect of employed CFL number in CASE #3. Since the time-step for every iteration is determined on the basis of CFL number, grid size, local contravariant velocities and speed of sound, the effect of CFL number on computational time and convergence history is quite noticible. All these test cases were converged within a same level of RMS limit, which is earlier defined. 
 
