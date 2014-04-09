@@ -67,7 +67,7 @@ $ CMakeLists.txt  io  main</pre>
 <h2>Flow chart of 2DEuler code running<a class="headerlink" href="#flow-chart-of-2deuler-code-running" title="Permalink to this headline">¶</a></h2>
 <p>The schematic below shows the flow chart of how the 2DEuler code runs. At the beggining of case running, the code reads the important parameters for grid information and numerical schemes. After then, it applies the proper initial conditions and set the variables to be applied to the main time loops.</p>
 <p>In the main loop, the time-integration for updating flux vector <span class="math">\(\vec{U}\)</span> is made. It begins with applying the pre-specified boundary conditions and calculate the time-step (dt) for time-level update. The main part of this loop is made by calling &#8216;AUSMPW+&#8217; flux splitting scheme.</p>
-<a class="reference internal image-reference" href="../_images/flowchart.png"><img alt="../_images/flowchart.png" src="../_images/flowchart.png" style="width: 80%;" /></a>
+<a class="reference internal image-reference" href="../_images/flowchart.png"><img alt="../_images/flowchart.png" src="../_images/flowchart.png" style="width: 60%;" /></a>
 </div>
 </div>
 

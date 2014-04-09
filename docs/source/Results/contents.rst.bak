@@ -10,7 +10,6 @@ The grid used in this project has a resolution of 71 X 48 in i- and j-directions
    :width: 60%
 
 
-
 CASE 1
 ------
 
@@ -24,6 +23,8 @@ The figure shown below illustrates the fully developed flow field around the air
 
 As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to form further downstream than expected theoretically.
 
+
+
 .. image:: ./images/Mach01.png
    :width: 60%
 
@@ -31,7 +32,7 @@ As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to for
 CASE 2
 ------
 
-- 2nd order accuracy MUSCL without flux limiter (CFL = 0.7): CASE 2
+- 2nd order accuracy MUSCL without flux limiter (CFL = 0.7)
 
 - MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\varphi` = 1, :math:`\kappa` = -1
 
@@ -41,6 +42,7 @@ Since multiple trials with different CFL number gives limitation of CFL number u
 
 .. image:: ./images/Mach02.png
    :width: 60%
+
 
 
 CASE 3
@@ -56,6 +58,7 @@ For the final case running, the second order accurate with minmod limiter is emp
    :width: 60%
 
 
+
 Comparative Analysis
 --------------------
 
@@ -69,6 +72,7 @@ The table shown below also tells about applicable maximum CFL number limit for e
    :width: 60%
 
 
+
 +-----------+----------------+-------------------------------+-----------------------+
 |           | CPU time (sec) | Iternation # for convergence  | Max. CFL to be stable |
 +-----------+----------------+-------------------------------+-----------------------+
@@ -78,6 +82,7 @@ The table shown below also tells about applicable maximum CFL number limit for e
 +-----------+----------------+-------------------------------+-----------------------+
 | CASE #3   | 2.74088        | 664                           | 0.75                  |
 +-----------+----------------+-------------------------------+-----------------------+
+
 
 
 The quantitative comparison for three different cases with exact invicid solution is made as shown below. The first figure shows the pressure development along the bottom wall. The 2DEuler solver seems to properly follow the theretically resolved solution. However, there is a little difference around the region that shock surface forms.
@@ -96,11 +101,10 @@ From the comparison of Mach number distribution along the bottom wall, very noti
    :width: 60%
 
 
-
 Effect of CFL (for CASE 3)
 --------------------------
 
-Following figures show the effect of employed CFL number in CASE #3. Since the time-step for every iteration is determined on the basis of CFL number, grid size, local contravariant velocities and speed of sound, the effect of CFL number on computational time and convergence history is quite noticible. All these test cases were converged within a same level of RMS limit, which is earlier defined. 
+Following figures show the effect of employed CFL number in CASE #3. Since the time-step for every iteration is determined on the basis of CFL number, grid size, local contravariant velocities and speed of sound, the effect of CFL number on computational time and convergence history is quite noticible. All these test cases were converged within a same level of RMS limit, which is earlier defined.
 
 As noticed from below, the smaller CFL number is, the more far solution is obtained away from the exact solution. The required iteration number gets bigger as CFL number decreases. This is simply because less CFL number reduces the time step and it then results in less change in state vector in every time step. Thus, smaller CFL number case may not be able to show the fully developed steady flow. This is the main reason why the case of CFL = 0.01 shows the far pressure away especially beyond the half of air foil. This can be clearly observed by looking at two snapshots obtained at the same RMS limit (but at different iteration number).
 
@@ -114,6 +118,7 @@ As noticed from below, the smaller CFL number is, the more far solution is obtai
 
 .. image:: ./images/CFL0.01.png
    :width: 60%
+
 
 .. image:: ./images/CFL0.5.png
    :width: 60%

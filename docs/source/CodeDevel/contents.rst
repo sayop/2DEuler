@@ -25,4 +25,4 @@ The schematic below shows the flow chart of how the 2DEuler code runs. At the be
 In the main loop, the time-integration for updating flux vector :math:`\vec{U}` is made. It begins with applying the pre-specified boundary conditions and calculate the time-step (dt) for time-level update. The main part of this loop is made by calling 'AUSMPW+' flux splitting scheme.
 
 .. image:: ./images/flowchart.png
-   :width: 80%
+   :width: 60%
