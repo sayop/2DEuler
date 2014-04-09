@@ -9,6 +9,7 @@ The grid used in this project has a resolution of 71 X 48 in i- and j-directions
 .. image:: ./images/grid.png
    :width: 60%
 
+<Computational grid>
 
 CASE 1
 ------
@@ -28,6 +29,8 @@ As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to for
 .. image:: ./images/Mach01.png
    :width: 60%
 
+<CASE1: Mach number contour plot>
+
 
 CASE 2
 ------
@@ -43,6 +46,7 @@ Since multiple trials with different CFL number gives limitation of CFL number u
 .. image:: ./images/Mach02.png
    :width: 60%
 
+<CASE2: Mach number contour plot>
 
 
 CASE 3
@@ -57,6 +61,7 @@ For the final case running, the second order accurate with minmod limiter is emp
 .. image:: ./images/Mach03.png
    :width: 60%
 
+<CASE3: Mach number contour plot>
 
 
 Comparative Analysis
@@ -71,6 +76,7 @@ The table shown below also tells about applicable maximum CFL number limit for e
 .. image:: ./images/CombinedRMS.png
    :width: 60%
 
+<Comparison of RMS history for three different cases>
 
 
 +-----------+----------------+-------------------------------+-----------------------+
@@ -82,6 +88,8 @@ The table shown below also tells about applicable maximum CFL number limit for e
 +-----------+----------------+-------------------------------+-----------------------+
 | CASE #3   | 2.74088        | 664                           | 0.75                  |
 +-----------+----------------+-------------------------------+-----------------------+
+
+<Table: required CPU time, total number of iterations, and maximum CFL number>
 
 
 
@@ -95,10 +103,15 @@ On the other hand, we can find quite meaningful difference between those differe
 .. image:: ./images/CombinedPressure.png
    :width: 60%
 
+<Comparison of pressure along the wall>
+
+
 From the comparison of Mach number distribution along the bottom wall, very noticible dispersion errors of second order accurate scheme can be found. When it comes to the TVD scheme, CASE #3 shows the more effective diminishing dispersion compared to the CASE #2 because it adapts the limited extrapolated state vector by using the slope limiter function as defined earlier.
 
 .. image:: ./images/CombinedMach.png
    :width: 60%
+
+<Comparison of Mach number along the wall>
 
 
 Effect of CFL (for CASE 3)
@@ -111,14 +124,26 @@ As noticed from below, the smaller CFL number is, the more far solution is obtai
 .. image:: ./images/CFLeffectPressure.png
    :width: 60%
 
+<Effect of CFL number on converged pressure distribution>
+
 
 .. image:: ./images/CFLeffectRMS.png
    :width: 60%
+
+<Effect of CFL number on RMS history>
 
 
 .. image:: ./images/CFL0.01.png
    :width: 60%
 
+(A: CFL = 0.01)
+
 
 .. image:: ./images/CFL0.5.png
    :width: 60%
+
+(B: CFL = 0.5)
+
+<Mach number contour for different CFL number>
+
+
