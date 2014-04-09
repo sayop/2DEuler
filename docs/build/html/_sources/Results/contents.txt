@@ -140,14 +140,6 @@ As noticed from below, the smaller CFL number is, the more far solution is obtai
 .. image:: ./images/CFL0.01.png
    :width: 60%
 
-(A: CFL = 0.01)
+<Mach number contour for CFL = 0.01>
 
-
-.. image:: ./images/CFL0.5.png
-   :width: 60%
-(B: CFL = 0.5)
-
-<Mach number contour for different CFL number>
-
-As discussed above, CFL number is quite sensitive parameter that may affect the convergence performance and steady-state solution.
 
