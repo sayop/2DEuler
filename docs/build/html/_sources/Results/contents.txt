@@ -26,6 +26,8 @@ As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to for
 
 
 
+.. image:: ./images/Mach01.png
+   :width: 60%
 
 <CASE1: Mach number contour plot>
 
