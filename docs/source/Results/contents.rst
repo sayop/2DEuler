@@ -10,8 +10,10 @@ The grid used in this project has a resolution of 71 X 48 in i- and j-directions
    :width: 60%
 
 
-CASE #1: 1st order accuracy (CFL = 0.8)
----------------------------------------
+CASE #1
+-------
+
+* 1st order accuracy (CFL = 0.8)
 
 MUSCL differencing setup: :math:`\epsilon` = 0
 
@@ -25,8 +27,10 @@ As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to for
    :width: 60%
 
 
-CASE #2: 2nd order accuracy MUSCL without flux limiter (CFL = 0.7)
-------------------------------------------------------------------
+CASE #2
+-------
+
+* 2nd order accuracy MUSCL without flux limiter (CFL = 0.7)
 
 MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\varphi` = 1, :math:`\kappa` = -1
 
@@ -37,8 +41,10 @@ Since multiple trials with different CFL number gives limitation of CFL number u
 .. image:: ./images/Mach02.png
    :width: 60%
 
-CASE #3: 2nd order accuracy MUSCL with minmod limiter (CFL = 0.7)
------------------------------------------------------------------
+CASE #3
+-------
+
+* 2nd order accuracy MUSCL with minmod limiter (CFL = 0.7)
 
 MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\kappa` = -1, :math:`\varphi`: set by minmod limiter
 

@@ -48,4 +48,4 @@ Computational Domain
 This project analyze the top half of a 10 deg. diamond airfoil so the location of point E is (x,y) = (0.5, 0.0882). Each grid point can be describd by (x,y) location or (:math:`i`, :math:`j`) location where the :math:`i` index is in the :math:`\xi` direction and the :math:`j` index is in the :math:`\eta` direction. The grid will consist of 71 points in the ":math:`i`" direction and 48 points in the ":math:`j`" direction. The inverse grid metrics must be evaluated at every grid point in the computational domain (including the boundaries). Use 2nd order accurate, central differences for interior points and 2nd order accurate, one-sided differences for boundary points. After the inverse metrics are computed, the grid Jacobian and grid metrics must be computed and stored at every location (including the boundaries)
 
 .. image:: ./images/domain.png
-   :width: 30% 
+   :width: 50% 
