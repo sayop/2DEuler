@@ -15,6 +15,15 @@ CASE 1
 
 - 1st order accuracy (CFL = 0.8)
 
+- MUSCL differencing setup: :math:`\epsilon` = 0
+
+The first case in this project was set to run with first order accurate with CFL = 0.8. Since this setup employs the first order accuracy, the MUSCL differencing uses neighborting one points from either left or right point. For this setup, :math:`\epsilon` was set to zero in the MUSCL diferencing extrapolation equations in 'Numerical Method' section.
+
+The figure shown below illustrates the fully developed flow field around the airfoil in terms of Mach number. Incoming supersonic flow with Mach = 2 meets the oblique shock so that the flow experiences dramatic change in Mach number. After the flow goes over the top edge of the airfoil, the Mach number goes up again and finally leads to the similar level of Mach number with incoming flow beyond the trailing edge.
+
+As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to form further downstream than expected theoretically.
+
+
 
 
 CASE 2
