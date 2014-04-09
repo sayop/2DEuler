@@ -1,5 +1,5 @@
-Results summary
-===============
+Results and discussions
+=======================
 
 Computational Grid
 ------------------
@@ -8,8 +8,6 @@ The grid used in this project has a resolution of 71 X 48 in i- and j-directions
 
 .. image:: ./images/grid.png
    :width: 60%
-
-
 
 
 
