@@ -43,6 +43,8 @@ The second trial for this project is made for running the Euler solver with high
 
 Since multiple trials with different CFL number gives limitation of CFL number use for this case, the second case was running with CFL = 0.7. Maximum CFL number criterion will be discussed later. Compared to the first case, the Prandtl-Meyer shock formation seems to be attached more close to the top edge. Thus, it can be conlcuded that the higher accurate scheme is more likely to properly predict the shock formation.
 
+.. image:: ./images/Mach02.png
+   :width: 60%
 
 <CASE2: Mach number contour plot>
 
@@ -57,6 +59,9 @@ CASE 3
 For the final case running, the second order accurate with minmod limiter is employed to introduce the TVD (Total Variation Diminishing) scheme. The figure shown below is the result of Mach number calculated from the CASE #3. This looks qualitatively same as the second result.
 
 
+.. image:: ./images/Mach03.png
+   :width: 60%
+
 <CASE3: Mach number contour plot>
 
 
@@ -69,6 +74,8 @@ The table shown below also tells about applicable maximum CFL number limit for e
 
 - Convergence check with RMS limit
 
+.. image:: ./images/CombinedRMS.png
+   :width: 60%
 
 <Comparison of RMS history for three different cases>
 
@@ -94,12 +101,18 @@ All three cases are somewhat limited to capture the shock surface that brings th
 On the other hand, we can find quite meaningful difference between those different cases. The comparison proves that the second order accurate is more likely to follow the high gradient in shock. The more enhanced achievement can be made with the greater resolution of the employed grid.
 
 
+.. image:: ./images/CombinedPressure.png
+   :width: 60%
 
 <Comparison of pressure along the wall>
 
 
 From the comparison of Mach number distribution along the bottom wall, very noticible dispersion errors of second order accurate scheme can be found. When it comes to the TVD scheme, CASE #3 shows the more effective diminishing dispersion compared to the CASE #2 because it adapts the limited extrapolated state vector by using the slope limiter function as defined earlier.
 
+
+
+.. image:: ./images/CombinedMach.png
+   :width: 60%
 
 <Comparison of Mach number along the wall>
 
