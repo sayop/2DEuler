@@ -53,32 +53,23 @@
 <p>The grid used in this project has a resolution of 71 X 48 in i- and j-directions as shown below. In this project, unsteady 2-dimensional Euler solution is being resolved by performing the explicit time-integration with AUSMPW+ flux-splitting scheme.</p>
 <a class="reference internal image-reference" href="../_images/grid.png"><img alt="../_images/grid.png" src="../_images/grid.png" style="width: 60%;" /></a>
 </div>
-<div class="section" id="case-1">
-<h2>CASE #1<a class="headerlink" href="#case-1" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>1st order accuracy (CFL = 0.8)</li>
-</ul>
+<div class="section" id="st-order-accuracy-cfl-0-8-case-1">
+<h2>1st order accuracy (CFL = 0.8): CASE 1<a class="headerlink" href="#st-order-accuracy-cfl-0-8-case-1" title="Permalink to this headline">¶</a></h2>
 <p>MUSCL differencing setup: <span class="math">\(\epsilon\)</span> = 0</p>
 <p>The first case in this project was set to run with first order accurate with CFL = 0.8. Since this setup employs the first order accuracy, the MUSCL differencing uses neighborting one points from either left or right point. For this setup, <span class="math">\(\epsilon\)</span> was set to zero in the MUSCL diferencing extrapolation equations in &#8216;Numerical Method&#8217; section.</p>
 <p>The figure shown below illustrates the fully developed flow field around the airfoil in terms of Mach number. Incoming supersonic flow with Mach = 2 meets the oblique shock so that the flow experiences dramatic change in Mach number. After the flow goes over the top edge of the airfoil, the Mach number goes up again and finally leads to the similar level of Mach number with incoming flow beyond the trailing edge.</p>
 <p>As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to form further downstream than expected theoretically.</p>
 <a class="reference internal image-reference" href="../_images/Mach01.png"><img alt="../_images/Mach01.png" src="../_images/Mach01.png" style="width: 60%;" /></a>
 </div>
-<div class="section" id="case-2">
-<h2>CASE #2<a class="headerlink" href="#case-2" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>2nd order accuracy MUSCL without flux limiter (CFL = 0.7)</li>
-</ul>
+<div class="section" id="nd-order-accuracy-muscl-without-flux-limiter-cfl-0-7-case-2">
+<h2>2nd order accuracy MUSCL without flux limiter (CFL = 0.7): CASE 2<a class="headerlink" href="#nd-order-accuracy-muscl-without-flux-limiter-cfl-0-7-case-2" title="Permalink to this headline">¶</a></h2>
 <p>MUSCL differencing setup: <span class="math">\(\epsilon\)</span> = 0, <span class="math">\(\varphi\)</span> = 1, <span class="math">\(\kappa\)</span> = -1</p>
 <p>The second trial for this project is made for running the Euler solver with higher order accurate MUSCL differencing. In this case, by setting <span class="math">\(\varphi\)</span> to 1 and <span class="math">\(\kappa\)</span> to -1, the scheme yields 2nd order accurate, fully upwind differencing.</p>
 <p>Since multiple trials with different CFL number gives limitation of CFL number use for this case, the second case was running with CFL = 0.7. Maximum CFL number criterion will be discussed later. Compared to the first case, the Prandtl-Meyer shock formation seems to be attached more close to the top edge. Thus, it can be conlcuded that the higher accurate scheme is more likely to properly predict the shock formation.</p>
 <a class="reference internal image-reference" href="../_images/Mach02.png"><img alt="../_images/Mach02.png" src="../_images/Mach02.png" style="width: 60%;" /></a>
 </div>
-<div class="section" id="case-3">
-<h2>CASE #3<a class="headerlink" href="#case-3" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>2nd order accuracy MUSCL with minmod limiter (CFL = 0.7)</li>
-</ul>
+<div class="section" id="nd-order-accuracy-muscl-with-minmod-limiter-cfl-0-7-case-3">
+<h2>2nd order accuracy MUSCL with minmod limiter (CFL = 0.7): CASE 3<a class="headerlink" href="#nd-order-accuracy-muscl-with-minmod-limiter-cfl-0-7-case-3" title="Permalink to this headline">¶</a></h2>
 <p>MUSCL differencing setup: <span class="math">\(\epsilon\)</span> = 0, <span class="math">\(\kappa\)</span> = -1, <span class="math">\(\varphi\)</span>: set by minmod limiter</p>
 <p>For the final case running, the second order accurate with minmod limiter is employed to introduce the TVD (Total Variation Diminishing) scheme. The figure shown below is the result of Mach number calculated from the CASE #3. This looks qualitatively same as the second result.</p>
 <a class="reference internal image-reference" href="../_images/Mach03.png"><img alt="../_images/Mach03.png" src="../_images/Mach03.png" style="width: 60%;" /></a>
@@ -149,9 +140,9 @@
   <ul>
 <li><a class="reference internal" href="#">Results summary</a><ul>
 <li><a class="reference internal" href="#computational-grid">Computational Grid</a></li>
-<li><a class="reference internal" href="#case-1">CASE #1</a></li>
-<li><a class="reference internal" href="#case-2">CASE #2</a></li>
-<li><a class="reference internal" href="#case-3">CASE #3</a></li>
+<li><a class="reference internal" href="#st-order-accuracy-cfl-0-8-case-1">1st order accuracy (CFL = 0.8): CASE 1</a></li>
+<li><a class="reference internal" href="#nd-order-accuracy-muscl-without-flux-limiter-cfl-0-7-case-2">2nd order accuracy MUSCL without flux limiter (CFL = 0.7): CASE 2</a></li>
+<li><a class="reference internal" href="#nd-order-accuracy-muscl-with-minmod-limiter-cfl-0-7-case-3">2nd order accuracy MUSCL with minmod limiter (CFL = 0.7): CASE 3</a></li>
 <li><a class="reference internal" href="#comparative-analysis">Comparative Analysis</a></li>
 <li><a class="reference internal" href="#effect-of-cfl-case-3">Effect of CFL (CASE #3)</a></li>
 </ul>
