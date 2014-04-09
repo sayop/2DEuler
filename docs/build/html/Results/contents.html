@@ -52,6 +52,7 @@
 <h2>Computational Grid<a class="headerlink" href="#computational-grid" title="Permalink to this headline">¶</a></h2>
 <p>The grid used in this project has a resolution of 71 X 48 in i- and j-directions as shown below. In this project, unsteady 2-dimensional Euler solution is being resolved by performing the explicit time-integration with AUSMPW+ flux-splitting scheme.</p>
 <a class="reference internal image-reference" href="../_images/grid.png"><img alt="../_images/grid.png" src="../_images/grid.png" style="width: 60%;" /></a>
+<p>&lt;Computational grid&gt;</p>
 </div>
 <div class="section" id="case-1">
 <h2>CASE 1<a class="headerlink" href="#case-1" title="Permalink to this headline">¶</a></h2>
@@ -63,6 +64,7 @@
 <p>The figure shown below illustrates the fully developed flow field around the airfoil in terms of Mach number. Incoming supersonic flow with Mach = 2 meets the oblique shock so that the flow experiences dramatic change in Mach number. After the flow goes over the top edge of the airfoil, the Mach number goes up again and finally leads to the similar level of Mach number with incoming flow beyond the trailing edge.</p>
 <p>As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to form further downstream than expected theoretically.</p>
 <a class="reference internal image-reference" href="../_images/Mach01.png"><img alt="../_images/Mach01.png" src="../_images/Mach01.png" style="width: 60%;" /></a>
+<p>&lt;CASE1: Mach number contour plot&gt;</p>
 </div>
 <div class="section" id="case-2">
 <h2>CASE 2<a class="headerlink" href="#case-2" title="Permalink to this headline">¶</a></h2>
@@ -73,6 +75,7 @@
 <p>The second trial for this project is made for running the Euler solver with higher order accurate MUSCL differencing. In this case, by setting <span class="math">\(\varphi\)</span> to 1 and <span class="math">\(\kappa\)</span> to -1, the scheme yields 2nd order accurate, fully upwind differencing.</p>
 <p>Since multiple trials with different CFL number gives limitation of CFL number use for this case, the second case was running with CFL = 0.7. Maximum CFL number criterion will be discussed later. Compared to the first case, the Prandtl-Meyer shock formation seems to be attached more close to the top edge. Thus, it can be conlcuded that the higher accurate scheme is more likely to properly predict the shock formation.</p>
 <a class="reference internal image-reference" href="../_images/Mach02.png"><img alt="../_images/Mach02.png" src="../_images/Mach02.png" style="width: 60%;" /></a>
+<p>&lt;CASE2: Mach number contour plot&gt;</p>
 </div>
 <div class="section" id="case-3">
 <h2>CASE 3<a class="headerlink" href="#case-3" title="Permalink to this headline">¶</a></h2>
@@ -82,6 +85,7 @@
 </ul>
 <p>For the final case running, the second order accurate with minmod limiter is employed to introduce the TVD (Total Variation Diminishing) scheme. The figure shown below is the result of Mach number calculated from the CASE #3. This looks qualitatively same as the second result.</p>
 <a class="reference internal image-reference" href="../_images/Mach03.png"><img alt="../_images/Mach03.png" src="../_images/Mach03.png" style="width: 60%;" /></a>
+<p>&lt;CASE3: Mach number contour plot&gt;</p>
 </div>
 <div class="section" id="comparative-analysis">
 <h2>Comparative Analysis<a class="headerlink" href="#comparative-analysis" title="Permalink to this headline">¶</a></h2>
@@ -91,6 +95,7 @@
 <li>Convergence check with RMS limit</li>
 </ul>
 <a class="reference internal image-reference" href="../_images/CombinedRMS.png"><img alt="../_images/CombinedRMS.png" src="../_images/CombinedRMS.png" style="width: 60%;" /></a>
+<p>&lt;Comparison of RMS history for three different cases&gt;</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="14%" />
@@ -121,21 +126,29 @@
 </tr>
 </tbody>
 </table>
+<p>&lt;Table: required CPU time, total number of iterations, and maximum CFL number&gt;</p>
 <p>The quantitative comparison for three different cases with exact invicid solution is made as shown below. The first figure shows the pressure development along the bottom wall. The 2DEuler solver seems to properly follow the theretically resolved solution. However, there is a little difference around the region that shock surface forms.</p>
 <p>All three cases are somewhat limited to capture the shock surface that brings the infinitesimally small region of sudden pressure change. The first reason of this is because of the limited grid resolution around the shock surface. The second possible reason is that the dissipative errors of the current scheme may lead to smear the high gradient out.</p>
 <p>On the other hand, we can find quite meaningful difference between those different cases. The comparison proves that the second order accurate is more likely to follow the high gradient in shock. The more enhanced achievement can be made with the greater resolution of the employed grid.</p>
 <a class="reference internal image-reference" href="../_images/CombinedPressure.png"><img alt="../_images/CombinedPressure.png" src="../_images/CombinedPressure.png" style="width: 60%;" /></a>
+<p>&lt;Comparison of pressure along the wall&gt;</p>
 <p>From the comparison of Mach number distribution along the bottom wall, very noticible dispersion errors of second order accurate scheme can be found. When it comes to the TVD scheme, CASE #3 shows the more effective diminishing dispersion compared to the CASE #2 because it adapts the limited extrapolated state vector by using the slope limiter function as defined earlier.</p>
 <a class="reference internal image-reference" href="../_images/CombinedMach.png"><img alt="../_images/CombinedMach.png" src="../_images/CombinedMach.png" style="width: 60%;" /></a>
+<p>&lt;Comparison of Mach number along the wall&gt;</p>
 </div>
 <div class="section" id="effect-of-cfl-for-case-3">
 <h2>Effect of CFL (for CASE 3)<a class="headerlink" href="#effect-of-cfl-for-case-3" title="Permalink to this headline">¶</a></h2>
 <p>Following figures show the effect of employed CFL number in CASE #3. Since the time-step for every iteration is determined on the basis of CFL number, grid size, local contravariant velocities and speed of sound, the effect of CFL number on computational time and convergence history is quite noticible. All these test cases were converged within a same level of RMS limit, which is earlier defined.</p>
 <p>As noticed from below, the smaller CFL number is, the more far solution is obtained away from the exact solution. The required iteration number gets bigger as CFL number decreases. This is simply because less CFL number reduces the time step and it then results in less change in state vector in every time step. Thus, smaller CFL number case may not be able to show the fully developed steady flow. This is the main reason why the case of CFL = 0.01 shows the far pressure away especially beyond the half of air foil. This can be clearly observed by looking at two snapshots obtained at the same RMS limit (but at different iteration number).</p>
 <a class="reference internal image-reference" href="../_images/CFLeffectPressure.png"><img alt="../_images/CFLeffectPressure.png" src="../_images/CFLeffectPressure.png" style="width: 60%;" /></a>
+<p>&lt;Effect of CFL number on converged pressure distribution&gt;</p>
 <a class="reference internal image-reference" href="../_images/CFLeffectRMS.png"><img alt="../_images/CFLeffectRMS.png" src="../_images/CFLeffectRMS.png" style="width: 60%;" /></a>
+<p>&lt;Effect of CFL number on RMS history&gt;</p>
 <a class="reference internal image-reference" href="../_images/CFL0.01.png"><img alt="../_images/CFL0.01.png" src="../_images/CFL0.01.png" style="width: 60%;" /></a>
+<p>(A: CFL = 0.01)</p>
 <a class="reference internal image-reference" href="../_images/CFL0.5.png"><img alt="../_images/CFL0.5.png" src="../_images/CFL0.5.png" style="width: 60%;" /></a>
+<p>(B: CFL = 0.5)</p>
+<p>&lt;Mach number contour for different CFL number&gt;</p>
 </div>
 </div>
 
