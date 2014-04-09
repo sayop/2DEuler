@@ -137,9 +137,17 @@ Following figures show the effect of employed CFL number in CASE #3. Since the t
 
 As noticed from below, the smaller CFL number is, the more far solution is obtained away from the exact solution. The required iteration number gets bigger as CFL number decreases. This is simply because less CFL number reduces the time step and it then results in less change in state vector in every time step. Thus, smaller CFL number case may not be able to show the fully developed steady flow. This is the main reason why the case of CFL = 0.01 shows the far pressure away especially beyond the half of air foil. This can be clearly observed by looking at below two snapshots obtained at the same RMS limit (but at different iteration number).
 
-.. image:: ./images/CFL0.01.png
+.. image:: ./images/CFL001.png
    :width: 50%
 
-<Mach number contour for CFL = 0.01>
+(A: CFL = 0.01)
+
+
+.. image:: ./images/CFL05.png
+   :width: 60%
+
+(B: CFL = 0.5)
+
+<Mach number contour for different CFL number>
 
 
