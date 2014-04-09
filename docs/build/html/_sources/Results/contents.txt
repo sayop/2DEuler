@@ -25,12 +25,23 @@ As observed near at the top edge, shock surface (Prandtl-Meyer fan) seems to for
 
 
 
+.. image:: ./images/Mach01.png
+   :width: 60%
+
 
 CASE 2
 ------
 
 - 2nd order accuracy MUSCL without flux limiter (CFL = 0.7)
 
+- MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\varphi` = 1, :math:`\kappa` = -1
+
+The second trial for this project is made for running the Euler solver with higher order accurate MUSCL differencing. In this case, by setting :math:`\varphi` to 1 and :math:`\kappa` to -1, the scheme yields 2nd order accurate, fully upwind differencing.
+
+Since multiple trials with different CFL number gives limitation of CFL number use for this case, the second case was running with CFL = 0.7. Maximum CFL number criterion will be discussed later. Compared to the first case, the Prandtl-Meyer shock formation seems to be attached more close to the top edge. Thus, it can be conlcuded that the higher accurate scheme is more likely to properly predict the shock formation.
+
+.. image:: ./images/Mach02.png
+   :width: 60%
 
 
 
@@ -39,6 +50,12 @@ CASE 3
 
 - 2nd order accuracy MUSCL with minmod limiter (CFL = 0.7)
 
+- MUSCL differencing setup: :math:`\epsilon` = 0, :math:`\kappa` = -1, :math:`\varphi`: set by minmod limiter
+
+For the final case running, the second order accurate with minmod limiter is employed to introduce the TVD (Total Variation Diminishing) scheme. The figure shown below is the result of Mach number calculated from the CASE #3. This looks qualitatively same as the second result.
+
+.. image:: ./images/Mach03.png
+   :width: 60%
 
 
 
@@ -51,6 +68,27 @@ The table shown below also tells about applicable maximum CFL number limit for e
 
 - Convergence check with RMS limit
 
+.. image:: ./images/CombinedRMS.png
+   :width: 60%
+
+
+table!!!!
+
+
+The quantitative comparison for three different cases with exact invicid solution is made as shown below. The first figure shows the pressure development along the bottom wall. The 2DEuler solver seems to properly follow the theretically resolved solution. However, there is a little difference around the region that shock surface forms.
+
+All three cases are somewhat limited to capture the shock surface that brings the infinitesimally small region of sudden pressure change. The first reason of this is because of the limited grid resolution around the shock surface. The second possible reason is that the dissipative errors of the current scheme may lead to smear the high gradient out.
+
+On the other hand, we can find quite meaningful difference between those different cases. The comparison proves that the second order accurate is more likely to follow the high gradient in shock. The more enhanced achievement can be made with the greater resolution of the employed grid.
+
+
+.. image:: ./images/CombinedPressure.png
+   :width: 60%
+
+From the comparison of Mach number distribution along the bottom wall, very noticible dispersion errors of second order accurate scheme can be found. When it comes to the TVD scheme, CASE #3 shows the more effective diminishing dispersion compared to the CASE #2 because it adapts the limited extrapolated state vector by using the slope limiter function as defined earlier.
+
+.. image:: ./images/CombinedMach.png
+   :width: 60%
 
 
 Effect of CFL (for CASE 3)
@@ -60,3 +98,17 @@ Following figures show the effect of employed CFL number in CASE #3. Since the t
 
 As noticed from below, the smaller CFL number is, the more far solution is obtained away from the exact solution. The required iteration number gets bigger as CFL number decreases. This is simply because less CFL number reduces the time step and it then results in less change in state vector in every time step. Thus, smaller CFL number case may not be able to show the fully developed steady flow. This is the main reason why the case of CFL = 0.01 shows the far pressure away especially beyond the half of air foil. This can be clearly observed by looking at two snapshots obtained at the same RMS limit (but at different iteration number).
 
+.. image:: ./images/CFLeffectPressure.png
+   :width: 60%
+
+
+.. image:: ./images/CFLeffectRMS.png
+   :width: 60%
+
+
+.. image:: ./images/CFL0.01.png
+   :width: 60%
+
+
+.. image:: ./images/CFL0.5.png
+   :width: 60%
