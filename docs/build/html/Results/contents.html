@@ -91,7 +91,36 @@
 <li>Convergence check with RMS limit</li>
 </ul>
 <a class="reference internal image-reference" href="../_images/CombinedRMS.png"><img alt="../_images/CombinedRMS.png" src="../_images/CombinedRMS.png" style="width: 60%;" /></a>
-<p>table!!!!</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="20%" />
+<col width="38%" />
+<col width="28%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>&nbsp;</td>
+<td>CPU time (sec)</td>
+<td>Iternation # for convergence</td>
+<td>Max. CFL to be stable</td>
+</tr>
+<tr class="row-even"><td>CASE #1</td>
+<td>1.78388</td>
+<td>583</td>
+<td>1.2</td>
+</tr>
+<tr class="row-odd"><td>CASE #2</td>
+<td>1.93979</td>
+<td>637</td>
+<td>0.8</td>
+</tr>
+<tr class="row-even"><td>CASE #3</td>
+<td>2.74088</td>
+<td>664</td>
+<td>0.75</td>
+</tr>
+</tbody>
+</table>
 <p>The quantitative comparison for three different cases with exact invicid solution is made as shown below. The first figure shows the pressure development along the bottom wall. The 2DEuler solver seems to properly follow the theretically resolved solution. However, there is a little difference around the region that shock surface forms.</p>
 <p>All three cases are somewhat limited to capture the shock surface that brings the infinitesimally small region of sudden pressure change. The first reason of this is because of the limited grid resolution around the shock surface. The second possible reason is that the dissipative errors of the current scheme may lead to smear the high gradient out.</p>
 <p>On the other hand, we can find quite meaningful difference between those different cases. The comparison proves that the second order accurate is more likely to follow the high gradient in shock. The more enhanced achievement can be made with the greater resolution of the employed grid.</p>

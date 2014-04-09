@@ -72,7 +72,17 @@ The table shown below also tells about applicable maximum CFL number limit for e
    :width: 60%
 
 
-table!!!!
+
++-----------+----------------+-------------------------------+-----------------------+
+|           | CPU time (sec) | Iternation # for convergence  | Max. CFL to be stable |
++-----------+----------------+-------------------------------+-----------------------+
+| CASE #1   | 1.78388        | 583                           | 1.2                   |
++-----------+----------------+-------------------------------+-----------------------+
+| CASE #2   | 1.93979        | 637                           | 0.8                   |
++-----------+----------------+-------------------------------+-----------------------+
+| CASE #3   | 2.74088        | 664                           | 0.75                  |
++-----------+----------------+-------------------------------+-----------------------+
+
 
 
 The quantitative comparison for three different cases with exact invicid solution is made as shown below. The first figure shows the pressure development along the bottom wall. The 2DEuler solver seems to properly follow the theretically resolved solution. However, there is a little difference around the region that shock surface forms.
