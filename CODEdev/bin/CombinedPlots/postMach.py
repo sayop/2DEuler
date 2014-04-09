@@ -71,7 +71,7 @@ plt.setp(legendText, fontsize=18)
 legend = plt.gca().get_legend()
 legend.draw_frame(False)
 
-pltFile = 'Mach.png'
+pltFile = 'CombinedMach.png'
 fig = plt.gcf()
 fig.set_size_inches(8,5)
 plt.tight_layout()

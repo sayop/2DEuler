@@ -27,7 +27,7 @@ dataExac = np.loadtxt(FileExac)
 xExac = dataExac[:,0]
 pExac = dataExac[:,1]
 
-# Plot for RMS log
+# Plot for pressure
 x1 = data1[:,0]
 pres1 = data1[:,4]
 
@@ -71,7 +71,7 @@ plt.setp(legendText, fontsize=18)
 legend = plt.gca().get_legend()
 legend.draw_frame(False)
 
-pltFile = 'Pressure.png'
+pltFile = 'CombinedPressure.png'
 fig = plt.gcf()
 fig.set_size_inches(8,5)
 plt.tight_layout()

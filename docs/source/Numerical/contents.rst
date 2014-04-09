@@ -55,3 +55,36 @@ where
    A_{1} = \sqrt{\eta_{x}^{2} + \eta_{y}^{2}}
 
 One thing to keep carefully in mind is that grid metrics quantities should not be left- and right- extrapolated because these quantities are transportable flow quantities but static grid-point related quantities.
+
+
+Initial and Boundary Conditions
+-------------------------------
+
+At the beginning of simulation, the 2DEuler code sets the initial condition. After then the code set the boundary conditions at every time step. The initial conditions at all grid points is set on the basis of following pre-specified flow quantities:
+
+.. math::
+   \rho = 4,\; \;\; \; u = 1.0,\; \;\; \;v = 1.0, \; \;\; \; \gamma = 1.4,\; \;\; \; p = \frac{1}{\gamma}
+
+
+The incoming flow and outflow are supersonic. Thus following pre-specified boundary conditions should be employed by
+
+
+Inflow: :math:`\vec{U}_{1,j}^{n}` (determined from the initial condition parameters)
+
+Outflow: :math:`\vec{U}_{imax,j}^{n} = \vec{U}_{imax-1,j}^{n}` (1st order extrapolation)
+
+Solid boundary: No velocity in the :math:`\eta` direction. The 2DEuler code uses a 2nd order extrapolation that is described in the project assignment.
+
+
+Convergence Limit
+-----------------
+
+In order to terminate the code running when the proper steady-state assumption can be made, the 2DEuler code calculates the RMS error at every time step as defined below:
+
+.. math::
+   \text{RMS}^{n} = \sqrt{\frac{1}{N}\sum_{m=1}^{4} \sum_{i=1}^{imax} \sum_{j=1}^{jmax} \left [ \left ( \vec{U}_{i,j}^{n+1} - \vec{U}_{i,j}^{n} \right )^{2} \right ]}
+
+The computation will stop when RMS error normalized by the RMS error at first iteration meets the following criteria:
+
+.. math::
+   \frac{\text{RMS}^{n}}{\text{RMS}^{n=1}} \leq 1\text{x}10^{-3}
