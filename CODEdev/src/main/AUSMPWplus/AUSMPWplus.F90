@@ -342,14 +342,19 @@ CONTAINS
         UL(n) = U(n,i,j)
         CYCLE
       END IF
-      DelUmHalf = U(n,i,j) - U(n,i+im,j+im)
+!      IF(i .EQ. imax-1 .OR. j .EQ. jmax-1) THEN
+!        ! Right boundary
+!        UL(n) = U(n,i,j)
+!        CYCLE
+!      END IF
+      DelUmHalf = U(n,i,j) - U(n,i+im,j+jm)
       DelUpHalf = U(n,i+ip,j+jp) - U(n,i,j)
+      rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
       SELECT CASE(limiter)
       CASE(0)
         phi1 = 1.0_wp
         phi2 = 1.0_wp
       CASE(1)
-        rL = (DelUpHalf + 1.0E-6) / (DelUmHalf + 1.0E-6)
         IF(rL .GE. 0.0_wp) THEN
           phi1 = minmod(rL, 1.0_wp)
           phi2 = minmod(1.0_wp / rL, 1.0_wp)
@@ -365,7 +370,7 @@ CONTAINS
 
 
   FUNCTION RightExtrapolateU(axis,i,j) RESULT(UR)
-    USE SimulationVars_m, ONLY: U, imax, jmax
+    USE SimulationVars_m, ONLY: U, imin, jmin, imax, jmax
     IMPLICIT NONE
     INTEGER :: i, j, n, ip, jp, ipp, jpp
     CHARACTER(LEN=1) :: axis
@@ -385,6 +390,11 @@ CONTAINS
     END IF
     !beta = (3.0_wp - kappa) / (1.0_wp - kappa)
     DO n = 1, 4
+!      IF(i .EQ. imin .OR. j .EQ. jmin) THEN
+!        ! Left boundary
+!        UR(n) = U(n,i+ip,j+jp)
+!        CYCLE
+!      END IF
       IF(i+ip .EQ. imax .OR. j+jp .EQ. jmax) THEN
         ! Right boundary
         UR(n) = U(n,i+ip,j+jp)
@@ -392,12 +402,12 @@ CONTAINS
       END IF
       DelUpHalf = U(n,i+ip,j+jp) - U(n,i,j)
       DelUppHalf = U(n,i+ipp,j+jpp) - U(n,i+ip,j+jp)
+      rR = (DelUpHalf + 1.0E-6) / (DelUppHalf + 1.0E-6)
       SELECT CASE(limiter)
       CASE(0)
         phi1 = 1.0_wp
         phi2 = 1.0_wp
       CASE(1)
-        rR = (DelUpHalf + 1.0E-6) / (DelUppHalf + 1.0E-6)
         IF(rR .GE. 0.0_wp) THEN
           phi1 = minmod(rR, 1.0_wp)
           phi2 = minmod(1.0_wp / rR, 1.0_wp)
